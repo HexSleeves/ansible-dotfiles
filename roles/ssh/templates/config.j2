@@ -1,0 +1,74 @@
+{% if ansible_os_family == "Darwin" %}
+# Added by OrbStack: 'orb' SSH host for Linux machines
+Include ~/.orbstack/ssh/config
+{% endif %}
+
+# =============================================================================
+# SSH Config — managed by Ansible
+# =============================================================================
+
+Host *
+    AddKeysToAgent yes
+{% if ansible_os_family == "Darwin" %}
+    UseKeychain yes
+{% endif %}
+    IdentitiesOnly yes
+    ControlMaster auto
+    ControlPath ~/.ssh/sockets/%r@%h-%p
+    ControlPersist 600
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+    TCPKeepAlive yes
+    HashKnownHosts yes
+    VisualHostKey no
+    StrictHostKeyChecking ask
+    UpdateHostKeys yes
+    VerifyHostKeyDNS yes
+    Compression yes
+    ConnectionAttempts 2
+    PreferredAuthentications publickey,keyboard-interactive,password
+    PubkeyAuthentication yes
+    PasswordAuthentication no
+    Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+    KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
+    MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256
+    HostKeyAlgorithms ssh-ed25519-cert-v01@openssh.com,ssh-ed25519,rsa-sha2-512-cert-v01@openssh.com,rsa-sha2-256-cert-v01@openssh.com,rsa-sha2-512,rsa-sha2-256
+
+# 1Password SSH agent
+Host *
+{% if ansible_os_family == "Darwin" %}
+    IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+{% else %}
+    IdentityAgent ~/.1password/agent.sock
+{% endif %}
+
+Host github.com
+    HostName github.com
+    User git
+
+Host gist.github.com
+    HostName gist.github.com
+    User git
+
+Host *.bayer.com *.bayer.cnb
+    IdentityFile ~/.ssh/id_bayer
+
+Host localhost 127.0.0.1
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    LogLevel ERROR
+
+Host noon-disk.exe.xyz
+    User exedev
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+
+Host vs3.spacecats.dev *.vs3.spacecats.dev
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+
+Host safe-tide
+    HostName vs3.spacecats.dev
+    User safe-tide
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes

@@ -1,0 +1,83 @@
+---
+macos_defaults:
+  # Disable sound effects on boot
+  - { domain: com.apple.systemsound, key: com.apple.sound.beep.volume, type: float, value: 0 }
+
+  # Save to disk rather than iCloud by default
+  - { domain: NSGlobalDomain, key: NSDocumentSaveNewDocumentsToCloud, type: bool, value: false }
+
+  # Expand save panel by default
+  - { domain: NSGlobalDomain, key: NSNavPanelExpandedStateForSaveMode, type: bool, value: true }
+  - { domain: NSGlobalDomain, key: NSNavPanelExpandedStateForSaveMode2, type: bool, value: true }
+
+  # Expand print panel by default
+  - { domain: NSGlobalDomain, key: PMPrintingExpandedStateForPrint, type: bool, value: true }
+  - { domain: NSGlobalDomain, key: PMPrintingExpandedStateForPrint2, type: bool, value: true }
+
+  # Disable automatic capitalization
+  - { domain: NSGlobalDomain, key: NSAutomaticCapitalizationEnabled, type: bool, value: false }
+
+  # Disable smart dashes
+  - { domain: NSGlobalDomain, key: NSAutomaticDashSubstitutionEnabled, type: bool, value: false }
+
+  # Disable automatic period substitution
+  - { domain: NSGlobalDomain, key: NSAutomaticPeriodSubstitutionEnabled, type: bool, value: false }
+
+  # Disable smart quotes
+  - { domain: NSGlobalDomain, key: NSAutomaticQuoteSubstitutionEnabled, type: bool, value: false }
+
+  # Disable auto-correct
+  - { domain: NSGlobalDomain, key: NSAutomaticSpellingCorrectionEnabled, type: bool, value: false }
+
+  # Fast key repeat
+  - { domain: NSGlobalDomain, key: KeyRepeat, type: int, value: 2 }
+  - { domain: NSGlobalDomain, key: InitialKeyRepeat, type: int, value: 15 }
+
+  # Trackpad: enable tap to click
+  - { domain: com.apple.driver.AppleBluetoothMultitouch.trackpad, key: Clicking, type: bool, value: true }
+  - { domain: NSGlobalDomain, key: com.apple.mouse.tapBehavior, type: int, value: 1 }
+
+  # Finder: show all file extensions
+  - { domain: NSGlobalDomain, key: AppleShowAllExtensions, type: bool, value: true }
+
+  # Finder: show hidden files
+  - { domain: com.apple.finder, key: AppleShowAllFiles, type: bool, value: true }
+
+  # Finder: show status bar
+  - { domain: com.apple.finder, key: ShowStatusBar, type: bool, value: true }
+
+  # Finder: show path bar
+  - { domain: com.apple.finder, key: ShowPathbar, type: bool, value: true }
+
+  # Finder: search current folder by default
+  - { domain: com.apple.finder, key: FXDefaultSearchScope, type: string, value: SCcf }
+
+  # Finder: disable extension change warning
+  - { domain: com.apple.finder, key: FXEnableExtensionChangeWarning, type: bool, value: false }
+
+  # Finder: use list view
+  - { domain: com.apple.finder, key: FXPreferredViewStyle, type: string, value: Nlsv }
+
+  # Dock: auto-hide
+  - { domain: com.apple.dock, key: autohide, type: bool, value: true }
+
+  # Dock: minimize windows into application icon
+  - { domain: com.apple.dock, key: minimize-to-application, type: bool, value: true }
+
+  # Dock: don't show recently used apps
+  - { domain: com.apple.dock, key: show-recents, type: bool, value: false }
+
+  # Dock: reduce dock size
+  - { domain: com.apple.dock, key: tilesize, type: int, value: 48 }
+
+  # Screenshots: save to ~/Desktop/Screenshots
+  - { domain: com.apple.screencapture, key: location, type: string, value: "~/Desktop/Screenshots" }
+
+  # Screenshots: save as PNG
+  - { domain: com.apple.screencapture, key: type, type: string, value: png }
+
+  # Screenshots: disable shadow
+  - { domain: com.apple.screencapture, key: disable-shadow, type: bool, value: true }
+
+  # Activity Monitor: show all processes
+  - { domain: com.apple.ActivityMonitor, key: ShowCategory, type: int, value: 0 }

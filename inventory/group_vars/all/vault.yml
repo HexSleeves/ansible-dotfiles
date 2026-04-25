@@ -1,0 +1,22 @@
+---
+# All secrets in this file must be encrypted with ansible-vault.
+# Encrypt a value: ansible-vault encrypt_string 'VALUE' --name 'VARNAME'
+# Encrypt a file:  ansible-vault encrypt path/to/file.yml
+#
+# SSH private keys (base64-encoded content of the key file)
+vault_ssh_key_ed25519: ""
+vault_ssh_key_bayer: ""
+
+# GPG keyring archive (base64-encoded gpg-keyring.tgz.gpg)
+vault_gpg_keyring_b64: ""
+vault_gpg_passphrase: ""
+
+# API keys / encrypted app configs
+vault_claude_settings: ""       # ~/.claude/settings.json
+vault_claude_config: ""         # ~/.claude.json
+vault_codex_config: ""          # ~/.codex/config.toml
+vault_cursor_mcp: ""            # ~/.cursor/mcp.json
+vault_npm_token: ""             # ~/.config/npm/npmrc
+vault_raycast_config: ""        # ~/.config/raycast/config.json
+vault_opencode_config: ""       # ~/.config/opencode/opencode.jsonc
+vault_aws_config: ""            # ~/.aws/config (if sensitive)

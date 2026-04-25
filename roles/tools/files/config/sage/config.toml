@@ -1,0 +1,47 @@
+# Sage Agent - Global Configuration
+# Applies to all sage-agent invocations across ~/Work/ projects
+
+[defaults]
+model       = "anthropic/claude-sonnet-4-6"
+max_turns   = 25
+
+# ── Model category routing (3-tier) ─────────────────────────────────────────
+# Mirrors the ADR-026 tier strategy in ~/Work/CLAUDE.md
+
+[categories.quick]
+# Haiku: lint fixes, simple transforms, boilerplate, type annotations
+model = "anthropic/claude-haiku-4-5-20251001"
+
+[categories.standard]
+# Sonnet: feature implementation, test writing, refactors
+model = "anthropic/claude-sonnet-4-6"
+
+[categories.deep]
+# Opus: architecture, security review, complex debugging
+model = "anthropic/claude-opus-4-6"
+
+# ── Per-project model overrides ──────────────────────────────────────────────
+
+[agents.workspace-orchestrator]
+model = "anthropic/claude-opus-4-6"
+
+[agents.backend-dev]
+model = "anthropic/claude-sonnet-4-6"
+
+[agents.backend-reviewer]
+model = "anthropic/claude-opus-4-6"
+
+[agents.backend-tester]
+model = "anthropic/claude-sonnet-4-6"
+
+[agents.frontend-dev]
+model = "anthropic/claude-sonnet-4-6"
+
+[agents.frontend-tester]
+model = "anthropic/claude-sonnet-4-6"
+
+[agents.monorepo-dev]
+model = "anthropic/claude-sonnet-4-6"
+
+[agents.db-migration]
+model = "anthropic/claude-opus-4-6"

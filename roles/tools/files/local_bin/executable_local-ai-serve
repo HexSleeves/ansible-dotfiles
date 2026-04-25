@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+config_file="${XDG_CONFIG_HOME:-$HOME/.config}/local-ai.env"
+if [ -f "$config_file" ]; then
+  set -a
+  # shellcheck source=/dev/null
+  . "$config_file"
+  set +a
+fi
+
+model="${1:-${LOCAL_AI_MODEL:-qwen3-coder:30b}}"
+host="${LOCAL_AI_HOST:-127.0.0.1}"
+port="${LOCAL_AI_PORT:-8080}"
+backend="${LOCAL_AI_BACKEND:-rocm}"
+threads="${LOCAL_AI_THREADS:-16}"
+ngl="${LOCAL_AI_NGL:--1}"
+
+exec /home/linuxbrew/.linuxbrew/bin/ramalama serve \
+  --backend "$backend" \
+  --host "$host" \
+  --port "$port" \
+  --keep-groups \
+  --pull missing \
+  --threads "$threads" \
+  --ngl "$ngl" \
+  "$model"

@@ -1,0 +1,70 @@
+---
+# Identity
+user_name: "Jacob LeCoq"
+user_email: "lecoqjacob@gmail.com"
+github_user: "HexSleeves"
+signing_key: "F5B8831AED0743F77428AC154B696C8ED1B35912"
+
+# XDG base dirs
+xdg_config_home: "{{ ansible_env.HOME }}/.config"
+xdg_data_home: "{{ ansible_env.HOME }}/.local/share"
+xdg_cache_home: "{{ ansible_env.HOME }}/.cache"
+xdg_state_home: "{{ ansible_env.HOME }}/.local/state"
+local_bin: "{{ ansible_env.HOME }}/.local/bin"
+
+# Machine class — override per host/group
+machine_class: "Personal"
+
+# Language versions
+python_version: "3.14"
+mongodb_version: "7.0"
+
+# Mise runtimes (all profiles)
+mise_core_tools:
+  - name: node
+    version: lts
+  - name: python
+    version: latest
+  - name: golang
+    version: latest
+  - name: deno
+    version: latest
+  - name: bun
+    version: latest
+
+# Mise runtimes (personal only)
+mise_personal_tools:
+  - name: rust
+    version: latest
+  - name: lua
+    version: latest
+  - name: neovim
+    version: latest
+  - name: yamlfmt
+    version: latest
+
+# Cargo tools installed via cargo-binstall (personal only)
+cargo_tools:
+  - bat
+  - ripgrep
+  - fd-find
+  - eza
+  - zoxide
+  - starship
+  - bottom
+  - tokei
+
+# NPM global tools (personal only)
+npm_global_tools:
+  - typescript
+  - ts-node
+  - neovim
+
+# External git repos
+external_repos:
+  - repo: "https://github.com/HexSleeves/nvim.git"
+    dest: "{{ xdg_config_home }}/nvim"
+    update: false
+  - repo: "https://github.com/HexSleeves/zdotdir.git"
+    dest: "{{ xdg_config_home }}/zsh"
+    update: false

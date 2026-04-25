@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily update for fedora-dev distrobox
+
+[Timer]
+OnBootSec=1h
+OnUnitInactiveSec=1d
+
+[Install]
+WantedBy=timers.target

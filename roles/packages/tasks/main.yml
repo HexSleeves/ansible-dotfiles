@@ -1,0 +1,55 @@
+---
+- name: Install packages (macOS)
+  when: ansible_os_family == "Darwin"
+  block:
+    - name: Install Homebrew
+      ansible.builtin.shell:
+        cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        creates: /opt/homebrew/bin/brew
+      environment:
+        NONINTERACTIVE: "1"
+
+    - name: Install Brewfile packages
+      community.general.homebrew_tap:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ homebrew_taps }}"
+
+    - name: Run brew bundle
+      ansible.builtin.command:
+        cmd: brew bundle --file={{ role_path }}/files/Brewfile --no-lock
+      register: brew_bundle
+      changed_when: "'Installing' in brew_bundle.stdout or 'Upgrading' in brew_bundle.stdout"
+
+- name: Install packages (Debian/Ubuntu)
+  become: true
+  when: ansible_os_family == "Debian"
+  block:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install apt packages
+      ansible.builtin.apt:
+        name: "{{ apt_packages }}"
+        state: present
+
+- name: Install packages (Arch)
+  become: true
+  when: ansible_distribution in ["Archlinux", "Arch Linux", "EndeavourOS", "Manjaro"]
+  block:
+    - name: Install pacman packages
+      community.general.pacman:
+        name: "{{ pacman_packages }}"
+        state: present
+        update_cache: true
+
+- name: Install packages (RHEL/Fedora)
+  become: true
+  when: ansible_os_family == "RedHat"
+  block:
+    - name: Install dnf packages
+      ansible.builtin.dnf:
+        name: "{{ dnf_packages }}"
+        state: present

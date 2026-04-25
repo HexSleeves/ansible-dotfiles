@@ -1,0 +1,7 @@
+.vault-password-op.sh
+.ansible_facts/
+*.retry
+*.pyc
+__pycache__/
+.firecrawl/
+*.log

@@ -1,0 +1,50 @@
+---
+- name: Full dotfiles setup
+  hosts: local
+  gather_facts: true
+
+  pre_tasks:
+    - name: Ensure ansible collections are installed
+      ansible.builtin.command:
+        cmd: ansible-galaxy collection install -r requirements.yml
+      delegate_to: localhost
+      run_once: true
+      changed_when: false
+
+  roles:
+    - role: common
+      tags: [common, bootstrap]
+
+    - role: packages
+      tags: [packages, bootstrap]
+
+    - role: mise
+      tags: [mise, tools]
+
+    - role: shell
+      tags: [shell, dotfiles]
+
+    - role: git
+      tags: [git, dotfiles]
+
+    - role: ssh
+      tags: [ssh, secrets]
+
+    - role: gpg
+      tags: [gpg, secrets]
+
+    - role: tools
+      tags: [tools, dotfiles]
+
+    - role: secrets
+      tags: [secrets]
+
+    - role: external
+      tags: [external]
+
+    - role: macos
+      tags: [macos]
+      when: ansible_os_family == "Darwin"
+
+    - role: tailscale
+      tags: [tailscale, network]

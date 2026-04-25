@@ -1,0 +1,78 @@
+---
+homebrew_taps:
+  - antoniorodr/memo
+  - hashicorp/tap
+  - openhue/cli
+  - steipete/tap
+  - yakitrak/yakitrak
+
+apt_packages:
+  - age
+  - atuin
+  - bat
+  - curl
+  - direnv
+  - fd-find
+  - fzf
+  - git
+  - git-delta
+  - gnupg
+  - htop
+  - jq
+  - just
+  - mosh
+  - neovim
+  - ripgrep
+  - shellcheck
+  - shfmt
+  - tmux
+  - tree
+  - wget
+  - zoxide
+  - zsh
+
+pacman_packages:
+  - age
+  - atuin
+  - bat
+  - curl
+  - direnv
+  - fd
+  - fzf
+  - git
+  - gnupg
+  - htop
+  - jq
+  - just
+  - mosh
+  - neovim
+  - ripgrep
+  - shellcheck
+  - shfmt
+  - tmux
+  - tree
+  - wget
+  - zoxide
+  - zsh
+
+dnf_packages:
+  - age
+  - bat
+  - curl
+  - direnv
+  - fd-find
+  - fzf
+  - git
+  - gnupg2
+  - htop
+  - jq
+  - mosh
+  - neovim
+  - ripgrep
+  - ShellCheck
+  - shfmt
+  - tmux
+  - tree
+  - wget
+  - zoxide
+  - zsh

@@ -1,0 +1,3 @@
+[ -f "$HOME/.profile" ] && . "$HOME/.profile"
+[ -f "$HOME/.config/shell/zshrc.sh" ] && . "$HOME/.config/shell/zshrc.sh"
+

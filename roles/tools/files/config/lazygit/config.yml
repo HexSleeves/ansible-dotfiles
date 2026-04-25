@@ -1,0 +1,122 @@
+# lazygit config — overrides only; anything omitted uses compiled defaults.
+# Reference:    https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
+# Pagers:       https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Pagers.md
+# Custom cmds:  https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Command_Keybindings.md
+
+gui:
+  nerdFontsVersion: "3"
+  showDivergenceFromBaseBranch: arrowAndNumber
+  showNumstatInFilesView: true
+  showRandomTip: false
+  showCommandLog: false
+  wrapLinesInStagingView: true
+  useHunkModeInStagingView: true
+  switchToFilesAfterStashPop: true
+  switchToFilesAfterStashApply: true
+  border: rounded
+  mainPanelSplitMode: flexible
+  filterMode: fuzzy
+  scrollOffBehavior: margin
+  scrollOffMargin: 3
+  theme:
+    activeBorderColor: [green, bold]
+    inactiveBorderColor: [default]
+    searchingActiveBorderColor: [cyan, bold]
+    selectedLineBgColor: [blue]
+    cherryPickedCommitBgColor: [cyan]
+    cherryPickedCommitFgColor: [blue]
+    unstagedChangesColor: [red]
+
+git:
+  # delta with clickable line-number hyperlinks back into the editor.
+  # `|` in any diff view cycles between entries in `pagers`.
+  pagers:
+    - pager: delta --dark --paging=never --line-numbers --hyperlinks --hyperlinks-file-link-format='lazygit-edit://{path}:{line}'
+    - pager: delta --dark --paging=never --side-by-side --line-numbers --hyperlinks --hyperlinks-file-link-format='lazygit-edit://{path}:{line}'
+  mainBranches: [development, main, master]
+  autoFetch: true
+  autoRefresh: true
+  autoForwardBranches: onlyMainBranches
+  fetchAll: true
+  autoStageResolvedConflicts: true
+  parseEmoji: true
+  log:
+    order: topo-order
+    showGraph: always
+    showWholeGraph: false
+  # Branches like feature/AB-123-thing -> commit prefix "[AB-123] ".
+  commitPrefix:
+    - pattern: '^\w+\/(\w+-\d+).*'
+      replace: '[$1] '
+  truncateCopiedCommitHashesTo: 12
+
+os:
+  editPreset: nvim
+  open: 'open {{filename}}'
+  openLink: 'open {{link}}'
+
+update:
+  method: background
+  days: 14
+
+refresher:
+  refreshInterval: 10
+  fetchInterval: 60
+
+confirmOnQuit: false
+quitOnTopLevelReturn: false
+disableStartupPopups: true
+promptToReturnFromSubprocess: false
+notARepository: prompt
+
+# Quality-of-life custom commands. Visible in the `?` keybindings menu.
+customCommands:
+  - key: 'O'
+    context: 'global'
+    description: 'Open PR for current branch on the web'
+    command: 'gh pr view --web 2>/dev/null || gh pr create --web'
+    output: terminal
+  - key: 'V'
+    context: 'commits,subCommits,reflogCommits'
+    description: 'Open selected commit on the remote web UI'
+    command: 'gh browse {{.SelectedLocalCommit.Hash}}'
+    output: terminal
+  - key: 'n'
+    context: 'localBranches'
+    description: 'New branch with guided type/name'
+    loadingText: 'Creating branch'
+    prompts:
+      - type: menu
+        title: 'Branch type'
+        key: Type
+        options:
+          - { name: feature,  value: feature }
+          - { name: fix,      value: fix }
+          - { name: chore,    value: chore }
+          - { name: hotfix,   value: hotfix }
+          - { name: refactor, value: refactor }
+      - type: input
+        title: 'Branch name (kebab-case)'
+        key: Name
+    command: 'git switch -c {{.Form.Type}}/{{.Form.Name}}'
+  - key: 'C'
+    context: 'files'
+    description: 'Commit with conventional-commit prefix'
+    prompts:
+      - type: menu
+        title: 'Type'
+        key: Type
+        options:
+          - { name: feat,     value: feat }
+          - { name: fix,      value: fix }
+          - { name: chore,    value: chore }
+          - { name: docs,     value: docs }
+          - { name: refactor, value: refactor }
+          - { name: test,     value: test }
+          - { name: style,    value: style }
+          - { name: ci,       value: ci }
+      - type: input
+        title: 'Commit message'
+        key: Msg
+    command: 'git commit -m "{{.Form.Type}}: {{.Form.Msg}}"'
+    output: log

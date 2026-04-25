@@ -1,0 +1,23 @@
+---
+common_debian_packages:
+  - git
+  - curl
+  - build-essential
+  - gnupg
+  - age
+  - wl-clipboard
+
+common_arch_packages:
+  - git
+  - curl
+  - base-devel
+  - gnupg
+  - age
+
+common_rhel_packages:
+  - git
+  - curl
+  - gcc
+  - gcc-c++
+  - make
+  - gnupg2

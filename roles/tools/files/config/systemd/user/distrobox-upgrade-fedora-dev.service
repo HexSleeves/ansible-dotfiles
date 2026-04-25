@@ -1,0 +1,8 @@
+[Unit]
+Description=Update fedora-dev distrobox
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/distrobox-upgrade fedora-dev
+StandardOutput=journal
+StandardError=journal

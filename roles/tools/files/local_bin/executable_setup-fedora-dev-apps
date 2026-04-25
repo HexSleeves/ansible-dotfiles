@@ -1,0 +1,159 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+target_box="${1:-fedora-dev}"
+source_box="${SOURCE_DISTROBOX:-fedora-apps}"
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/distrobox-fedora-dev-apps"
+tmp_dir=""
+
+log() {
+  printf '%s\n' "$*"
+}
+
+have_box() {
+  distrobox list | awk -F'|' 'NR > 1 {gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2}' | grep -Fxq "$1"
+}
+
+enter_box() {
+  distrobox enter "$1" -- bash -lc "$2"
+}
+
+ensure_target_box() {
+  if ! have_box "$target_box"; then
+    log "Missing distrobox: $target_box"
+    exit 1
+  fi
+}
+
+write_target_file() {
+  local src="$1"
+  local dst="$2"
+  enter_box "$target_box" "sudo install -D -m 0644 '$src' '$dst'"
+}
+
+setup_common_repos() {
+  local tmp_dir="$1"
+
+  cat >"$tmp_dir/vscode.repo" <<'EOF'
+[code]
+name=Visual Studio Code
+baseurl=https://packages.microsoft.com/yumrepos/vscode
+enabled=1
+autorefresh=1
+type=rpm-md
+gpgcheck=1
+gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+EOF
+
+  cat >"$tmp_dir/1password.repo" <<'EOF'
+[1password]
+name=1Password Stable Channel
+baseurl=https://downloads.1password.com/linux/rpm/stable/$basearch
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://downloads.1password.com/linux/keys/1password.asc
+EOF
+
+  write_target_file "$tmp_dir/vscode.repo" "/etc/yum.repos.d/vscode.repo"
+  enter_box "$target_box" "sudo rpm --import https://downloads.1password.com/linux/keys/1password.asc"
+  write_target_file "$tmp_dir/1password.repo" "/etc/yum.repos.d/1password.repo"
+}
+
+setup_warp_repo() {
+  local tmp_dir="$1"
+
+  if have_box "$source_box" && enter_box "$source_box" "rpm -q warp-terminal-preview >/dev/null 2>&1"; then
+    enter_box "$source_box" "cat /etc/yum.repos.d/warpdotdev-preview.repo" >"$tmp_dir/warpdotdev-preview.repo"
+    enter_box "$source_box" "cat /etc/pki/rpm-gpg/RPM-GPG-KEY-warpdotdev-preview" >"$tmp_dir/RPM-GPG-KEY-warpdotdev-preview"
+    write_target_file "$tmp_dir/warpdotdev-preview.repo" "/etc/yum.repos.d/warpdotdev-preview.repo"
+    write_target_file "$tmp_dir/RPM-GPG-KEY-warpdotdev-preview" "/etc/pki/rpm-gpg/RPM-GPG-KEY-warpdotdev-preview"
+    printf '%s\n' "warp-terminal-preview"
+    return
+  fi
+
+  cat >"$tmp_dir/warpdotdev.repo" <<'EOF'
+[warpdotdev]
+name=warpdotdev
+baseurl=https://releases.warp.dev/linux/rpm/stable
+enabled=1
+gpgcheck=1
+gpgkey=https://releases.warp.dev/linux/keys/warp.asc
+EOF
+
+  enter_box "$target_box" "sudo rpm --import https://releases.warp.dev/linux/keys/warp.asc"
+  write_target_file "$tmp_dir/warpdotdev.repo" "/etc/yum.repos.d/warpdotdev.repo"
+  printf '%s\n' "warp-terminal"
+}
+
+delete_old_exports() {
+  if ! have_box "$source_box"; then
+    return
+  fi
+
+  enter_box "$source_box" '
+    for bin in /usr/bin/code-insiders /usr/bin/1password /usr/bin/warp-terminal-preview /usr/bin/warp-terminal; do
+      [ -x "$bin" ] && distrobox-export --bin "$bin" --delete || true
+    done
+    for app in \
+      /usr/share/applications/code-insiders.desktop \
+      /usr/share/applications/1password.desktop \
+      /usr/share/applications/dev.warp.WarpPreview.desktop \
+      /usr/share/applications/dev.warp.Warp.desktop; do
+      [ -f "$app" ] && distrobox-export --app "$app" --delete || true
+    done
+  '
+}
+
+install_and_export() {
+  local warp_pkg="$1"
+
+  enter_box "$target_box" "sudo dnf install -y code-insiders 1password $warp_pkg"
+
+  enter_box "$target_box" '
+    distrobox-export --bin /usr/bin/code-insiders
+    distrobox-export --app /usr/share/applications/code-insiders.desktop
+    distrobox-export --bin /usr/bin/1password
+    distrobox-export --app /usr/share/applications/1password.desktop
+
+    if [ -x /usr/bin/warp-terminal-preview ]; then
+      distrobox-export --bin /usr/bin/warp-terminal-preview
+      distrobox-export --app /usr/share/applications/dev.warp.WarpPreview.desktop
+    elif [ -x /usr/bin/warp-terminal ]; then
+      distrobox-export --bin /usr/bin/warp-terminal
+      distrobox-export --app /usr/share/applications/dev.warp.Warp.desktop
+    fi
+  '
+}
+
+disable_legacy_updates() {
+  systemctl --user disable --now distrobox-upgrade-fedora-apps.timer >/dev/null 2>&1 || true
+  rm -f \
+    "$HOME/.config/systemd/user/distrobox-upgrade-fedora-apps.service" \
+    "$HOME/.config/systemd/user/distrobox-upgrade-fedora-apps.timer"
+  systemctl --user daemon-reload
+}
+
+refresh_desktop_cache() {
+  update-desktop-database "$HOME/.local/share/applications" >/dev/null 2>&1 || true
+}
+
+main() {
+  local warp_pkg
+
+  ensure_target_box
+  mkdir -p "$cache_dir"
+  tmp_dir="$(mktemp -d "$cache_dir/XXXXXX")"
+  trap 'rm -rf -- "$tmp_dir"' EXIT
+
+  setup_common_repos "$tmp_dir"
+  warp_pkg="$(setup_warp_repo "$tmp_dir")"
+  delete_old_exports
+  install_and_export "$warp_pkg"
+  disable_legacy_updates
+  refresh_desktop_cache
+
+  log "Exported GUI apps from $target_box"
+}
+
+main "$@"

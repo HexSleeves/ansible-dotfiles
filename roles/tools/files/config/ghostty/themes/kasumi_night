@@ -1,0 +1,32 @@
+# Kasumi Night - Ghostty Theme
+# Converted from Warp theme
+
+background = 121617
+foreground = d6dad7
+
+# Cursor
+cursor-color = 8fb3ad
+
+# Normal colors
+palette = 0=#121617
+palette = 1=#8f3e3e
+palette = 2=#5f7c74
+palette = 3=#9a8a4a
+palette = 4=#3f6272
+palette = 5=#6b5a7a
+palette = 6=#5f8a8a
+palette = 7=#cfd4d1
+
+# Bright colors
+palette = 8=#1e2425
+palette = 9=#b35a5a
+palette = 10=#7fa59b
+palette = 11=#c4b36a
+palette = 12=#5f8aa3
+palette = 13=#9073ad
+palette = 14=#7fbfb8
+palette = 15=#f2f4f3
+
+# Selection
+selection-foreground = d6dad7
+selection-background = 1f2b2c

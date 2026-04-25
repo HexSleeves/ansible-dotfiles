@@ -1,0 +1,59 @@
+---
+- name: Ensure GPG is installed
+  ansible.builtin.package:
+    name: gnupg
+    state: present
+  become: true
+  when: ansible_os_family != "Darwin"
+
+- name: Ensure GPG is installed (macOS)
+  community.general.homebrew:
+    name: gnupg
+    state: present
+  when: ansible_os_family == "Darwin"
+
+- name: Create GPG export dir
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/share/gnupg/.exported-keyring"
+    state: directory
+    mode: "0700"
+
+- name: Write GPG keyring archive from vault
+  ansible.builtin.copy:
+    content: "{{ vault_gpg_keyring_b64 | b64decode }}"
+    dest: /tmp/gpg-keyring.tgz.gpg
+    mode: "0600"
+  when: vault_gpg_keyring_b64 | length > 0
+  no_log: true
+
+- name: Decrypt and extract GPG keyring
+  ansible.builtin.shell: |
+    gpg --batch --passphrase {{ vault_gpg_passphrase | quote }} \
+        --output /tmp/gpg-keyring.tgz \
+        --decrypt /tmp/gpg-keyring.tgz.gpg
+    tar -xzf /tmp/gpg-keyring.tgz -C /tmp/gpg-extract/
+  args:
+    creates: "{{ ansible_env.HOME }}/.gnupg/trustdb.gpg"
+  when: vault_gpg_keyring_b64 | length > 0
+  no_log: true
+
+- name: Import GPG keys
+  ansible.builtin.shell: |
+    mkdir -p /tmp/gpg-extract
+    gpg --import /tmp/gpg-extract/*.asc 2>/dev/null || true
+    if [ -f /tmp/gpg-extract/ownertrust.txt ]; then
+      gpg --import-ownertrust /tmp/gpg-extract/ownertrust.txt
+    fi
+  args:
+    creates: "{{ ansible_env.HOME }}/.gnupg/trustdb.gpg"
+  when: vault_gpg_keyring_b64 | length > 0
+
+- name: Clean up temp GPG files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/gpg-keyring.tgz.gpg
+    - /tmp/gpg-keyring.tgz
+    - /tmp/gpg-extract
+  when: vault_gpg_keyring_b64 | length > 0

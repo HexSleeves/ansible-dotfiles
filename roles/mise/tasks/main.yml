@@ -1,0 +1,45 @@
+---
+- name: Install mise
+  ansible.builtin.shell:
+    cmd: curl https://mise.run | sh
+    creates: "{{ ansible_env.HOME }}/.local/bin/mise"
+  environment:
+    MISE_INSTALL_PATH: "{{ local_bin }}/mise"
+
+- name: Install mise core tools
+  ansible.builtin.command:
+    cmd: "{{ local_bin }}/mise use --global {{ item.name }}@{{ item.version }}"
+  loop: "{{ mise_core_tools }}"
+  register: mise_install
+  changed_when: "'installed' in mise_install.stdout | lower"
+
+- name: Install mise personal tools
+  ansible.builtin.command:
+    cmd: "{{ local_bin }}/mise use --global {{ item.name }}@{{ item.version }}"
+  loop: "{{ mise_personal_tools }}"
+  when: machine_class == "Personal"
+  register: mise_personal_install
+  changed_when: "'installed' in mise_personal_install.stdout | lower"
+
+- name: Install cargo-binstall
+  ansible.builtin.command:
+    cmd: "{{ local_bin }}/mise exec rust -- cargo install cargo-binstall"
+    creates: "{{ ansible_env.HOME }}/.cargo/bin/cargo-binstall"
+  when: machine_class == "Personal"
+
+- name: Install cargo tools via cargo-binstall
+  ansible.builtin.command:
+    cmd: "{{ ansible_env.HOME }}/.cargo/bin/cargo binstall --no-confirm --quiet {{ item }}"
+  loop: "{{ cargo_tools }}"
+  when: machine_class == "Personal"
+  register: cargo_install
+  changed_when: cargo_install.rc == 0
+  failed_when: false
+
+- name: Install NPM global tools
+  community.general.npm:
+    name: "{{ item }}"
+    global: true
+    state: present
+  loop: "{{ npm_global_tools }}"
+  when: machine_class == "Personal"

@@ -1,0 +1,55 @@
+---
+- name: Clone external git repos
+  ansible.builtin.git:
+    repo: "{{ item.repo }}"
+    dest: "{{ item.dest }}"
+    update: "{{ item.update | default(false) }}"
+    version: HEAD
+  loop: "{{ external_repos }}"
+
+- name: Download glow binary (Linux x86_64)
+  ansible.builtin.get_url:
+    url: "https://github.com/charmbracelet/glow/releases/download/v2.1.1/glow_Linux_x86_64.tar.gz"
+    dest: /tmp/glow.tar.gz
+    mode: "0644"
+  when:
+    - ansible_os_family != "Darwin"
+    - ansible_architecture == "x86_64"
+
+- name: Extract glow binary (Linux)
+  ansible.builtin.unarchive:
+    src: /tmp/glow.tar.gz
+    dest: "{{ local_bin }}"
+    include: glow
+    remote_src: true
+  when:
+    - ansible_os_family != "Darwin"
+    - ansible_architecture == "x86_64"
+
+- name: Download Monaspace fonts (Linux)
+  ansible.builtin.get_url:
+    url: "https://github.com/githubnext/monaspace/releases/download/v1.301/monaspace-v1.301.zip"
+    dest: /tmp/monaspace.zip
+    mode: "0644"
+  when: ansible_os_family != "Darwin"
+
+- name: Create fonts dir
+  ansible.builtin.file:
+    path: "{{ xdg_data_home }}/fonts/Monaspace"
+    state: directory
+    mode: "0755"
+  when: ansible_os_family != "Darwin"
+
+- name: Extract Monaspace fonts (Linux)
+  ansible.builtin.unarchive:
+    src: /tmp/monaspace.zip
+    dest: "{{ xdg_data_home }}/fonts/Monaspace"
+    remote_src: true
+    extra_opts: ["--strip-components=1"]
+  when: ansible_os_family != "Darwin"
+
+- name: Refresh font cache (Linux)
+  ansible.builtin.command:
+    cmd: fc-cache -f
+  when: ansible_os_family != "Darwin"
+  changed_when: true

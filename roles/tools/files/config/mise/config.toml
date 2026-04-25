@@ -1,0 +1,38 @@
+[tools]
+bun            = "latest"
+cargo-binstall = "latest"
+deno           = "latest"
+go             = "latest"
+lua            = "latest"
+neovim         = "nightly"
+node           = "lts"
+pnpm           = "latest"
+python         = "latest"
+usage          = "latest"
+yamlfmt        = "latest"
+
+[settings]
+# behavior
+experimental        = true
+activate_aggressive = true
+pin                 = true
+
+# performance (16-core box)
+jobs                                  = 16
+http_retries                          = 3
+fetch_remote_versions_cache           = "24h"
+plugin_autoupdate_last_check_duration = "30d"
+
+# reproducibility
+lockfile           = true
+lockfile_platforms = ["linux-x64"]
+
+# supply-chain hardening
+github_attestations = true
+slsa                = true
+# install_before    = "7d"   # available in newer mise; unknown setting on 2026.4.22
+
+# ergonomics
+idiomatic_version_file_enable_tools = ["python", "node"]
+trusted_config_paths                = ["~/projects", "~/.codex", "~/.config"]
+use_versions_host_track             = false

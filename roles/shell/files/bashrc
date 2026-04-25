@@ -1,0 +1,12 @@
+[ -f /etc/bashrc ] && . /etc/bashrc
+[ -f "$HOME/.profile" ] && . "$HOME/.profile"
+
+if [ -d ~/.bashrc.d ]; then
+  for rc in ~/.bashrc.d/*; do
+    [ -f "$rc" ] && . "$rc"
+  done
+fi
+unset rc
+
+test -f /usr/share/ublue-os/bling/bling.sh && source /usr/share/ublue-os/bling/bling.sh
+[ -f "$HOME/.config/shell/bashrc.sh" ] && . "$HOME/.config/shell/bashrc.sh"
