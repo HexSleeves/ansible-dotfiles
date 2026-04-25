@@ -1,4 +1,4 @@
-.vault-password-op.sh
+.vault-pass
 .ansible_facts/
 *.retry
 *.pyc
