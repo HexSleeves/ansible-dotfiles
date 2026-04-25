@@ -1,10 +1,20 @@
 ---
+- name: Check if GPG is installed
+  ansible.builtin.command:
+    cmd: which gpg
+  register: gpg_check
+  changed_when: false
+  failed_when: false
+
 - name: Ensure GPG is installed
   ansible.builtin.package:
     name: gnupg
     state: present
   become: true
-  when: ansible_os_family != "Darwin"
+  when:
+    - ansible_facts['os_family'] != "Darwin"
+    - gpg_check.rc != 0
+  tags: [packages, bootstrap]
 
 - name: Ensure GPG is installed (macOS)
   community.general.homebrew:
@@ -14,7 +24,7 @@
 
 - name: Create GPG export dir
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.local/share/gnupg/.exported-keyring"
+    path: "{{ _home }}/.local/share/gnupg/.exported-keyring"
     state: directory
     mode: "0700"
 
@@ -33,7 +43,7 @@
         --decrypt /tmp/gpg-keyring.tgz.gpg
     tar -xzf /tmp/gpg-keyring.tgz -C /tmp/gpg-extract/
   args:
-    creates: "{{ ansible_env.HOME }}/.gnupg/trustdb.gpg"
+    creates: "{{ _home }}/.gnupg/trustdb.gpg"
   when: vault_gpg_keyring_b64 | length > 0
   no_log: true
 
@@ -45,7 +55,7 @@
       gpg --import-ownertrust /tmp/gpg-extract/ownertrust.txt
     fi
   args:
-    creates: "{{ ansible_env.HOME }}/.gnupg/trustdb.gpg"
+    creates: "{{ _home }}/.gnupg/trustdb.gpg"
   when: vault_gpg_keyring_b64 | length > 0
 
 - name: Clean up temp GPG files

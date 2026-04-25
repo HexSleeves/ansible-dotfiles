@@ -10,11 +10,11 @@
     - "{{ xdg_cache_home }}"
     - "{{ xdg_state_home }}"
     - "{{ local_bin }}"
-    - "{{ ansible_env.HOME }}/.ssh/sockets"
+    - "{{ _home }}/.ssh/sockets"
 
 - name: Set SSH sockets dir permissions
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.ssh/sockets"
+    path: "{{ _home }}/.ssh/sockets"
     mode: "0700"
 
 - name: Install base packages (Debian/Ubuntu)
@@ -23,18 +23,21 @@
     name: "{{ common_debian_packages }}"
     state: present
     update_cache: true
-  when: ansible_os_family == "Debian"
+  when: ansible_facts['os_family'] == "Debian"
+  tags: [packages, bootstrap]
 
 - name: Install base packages (Arch)
   become: true
   community.general.pacman:
     name: "{{ common_arch_packages }}"
     state: present
-  when: ansible_distribution in ["Archlinux", "Arch Linux", "EndeavourOS", "Manjaro"]
+  when: ansible_facts['distribution'] in ["Archlinux", "Arch Linux", "EndeavourOS", "Manjaro"]
+  tags: [packages, bootstrap]
 
 - name: Install base packages (RHEL/Fedora)
   become: true
   ansible.builtin.dnf:
     name: "{{ common_rhel_packages }}"
     state: present
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts['os_family'] == "RedHat"
+  tags: [packages, bootstrap]

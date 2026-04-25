@@ -34,7 +34,7 @@
       tags: [gpg, secrets]
 
     - role: tools
-      tags: [tools, dotfiles]
+      tags: [tools, dotfiles, niri]
 
     - role: secrets
       tags: [secrets]

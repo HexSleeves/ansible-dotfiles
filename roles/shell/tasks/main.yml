@@ -8,7 +8,7 @@
 - name: Copy shell dotfiles to home
   ansible.builtin.copy:
     src: "{{ item.src }}"
-    dest: "{{ ansible_env.HOME }}/{{ item.dest }}"
+    dest: "{{ _home }}/{{ item.dest }}"
     mode: "0644"
   loop:
     - { src: zshrc,       dest: .zshrc }

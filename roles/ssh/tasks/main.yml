@@ -1,20 +1,20 @@
 ---
 - name: Create ~/.ssh directory
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.ssh"
+    path: "{{ _home }}/.ssh"
     state: directory
     mode: "0700"
 
 - name: Template SSH config
   ansible.builtin.template:
     src: config.j2
-    dest: "{{ ansible_env.HOME }}/.ssh/config"
+    dest: "{{ _home }}/.ssh/config"
     mode: "0600"
 
 - name: Deploy SSH private key (ed25519)
   ansible.builtin.copy:
     content: "{{ vault_ssh_key_ed25519 }}"
-    dest: "{{ ansible_env.HOME }}/.ssh/id_ed25519"
+    dest: "{{ _home }}/.ssh/id_ed25519"
     mode: "0600"
   when: vault_ssh_key_ed25519 | length > 0
   no_log: true
@@ -22,7 +22,7 @@
 - name: Deploy SSH private key (Bayer)
   ansible.builtin.copy:
     content: "{{ vault_ssh_key_bayer }}"
-    dest: "{{ ansible_env.HOME }}/.ssh/id_bayer"
+    dest: "{{ _home }}/.ssh/id_bayer"
     mode: "0600"
   when: vault_ssh_key_bayer | length > 0
   no_log: true
@@ -30,5 +30,5 @@
 - name: Copy SSH public key (ed25519)
   ansible.builtin.copy:
     src: id_ed25519.pub
-    dest: "{{ ansible_env.HOME }}/.ssh/id_ed25519.pub"
+    dest: "{{ _home }}/.ssh/id_ed25519.pub"
     mode: "0644"

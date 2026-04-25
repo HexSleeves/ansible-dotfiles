@@ -10,9 +10,9 @@
     - gh
     - ghostty
     - htop
-    - jq
     - lazygit
     - mise
+    - niri
     - sage
     - tmux
     - zed
@@ -45,20 +45,20 @@
 
 - name: Deploy ~/.pilot config
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.pilot"
+    path: "{{ _home }}/.pilot"
     state: directory
     mode: "0755"
 
 - name: Copy pilot config
   ansible.builtin.copy:
     src: pilot/
-    dest: "{{ ansible_env.HOME }}/.pilot/"
+    dest: "{{ _home }}/.pilot/"
     mode: "0644"
 
 - name: Deploy justfile
   ansible.builtin.copy:
     src: justfile
-    dest: "{{ ansible_env.HOME }}/justfile"
+    dest: "{{ _home }}/justfile"
     mode: "0644"
 
 - name: Deploy ~/.local/bin scripts
@@ -71,12 +71,12 @@
 
 - name: Deploy AWS config
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.aws"
+    path: "{{ _home }}/.aws"
     state: directory
     mode: "0700"
 
 - name: Copy AWS config
   ansible.builtin.copy:
     src: aws/private_config
-    dest: "{{ ansible_env.HOME }}/.aws/config"
+    dest: "{{ _home }}/.aws/config"
     mode: "0600"

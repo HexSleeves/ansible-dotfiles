@@ -22,12 +22,14 @@ apt_packages:
   - just
   - mosh
   - neovim
+  - niri
   - ripgrep
   - shellcheck
   - shfmt
   - tmux
   - tree
   - wget
+  - xwayland-satellite
   - zoxide
   - zsh
 
@@ -46,12 +48,14 @@ pacman_packages:
   - just
   - mosh
   - neovim
+  - niri
   - ripgrep
   - shellcheck
   - shfmt
   - tmux
   - tree
   - wget
+  - xwayland-satellite
   - zoxide
   - zsh
 

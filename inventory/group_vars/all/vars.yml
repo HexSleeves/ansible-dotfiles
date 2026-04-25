@@ -6,11 +6,12 @@ github_user: "HexSleeves"
 signing_key: "F5B8831AED0743F77428AC154B696C8ED1B35912"
 
 # XDG base dirs
-xdg_config_home: "{{ ansible_env.HOME }}/.config"
-xdg_data_home: "{{ ansible_env.HOME }}/.local/share"
-xdg_cache_home: "{{ ansible_env.HOME }}/.cache"
-xdg_state_home: "{{ ansible_env.HOME }}/.local/state"
-local_bin: "{{ ansible_env.HOME }}/.local/bin"
+_home: "{{ lookup('env', 'HOME') }}"
+xdg_config_home: "{{ _home }}/.config"
+xdg_data_home: "{{ _home }}/.local/share"
+xdg_cache_home: "{{ _home }}/.cache"
+xdg_state_home: "{{ _home }}/.local/state"
+local_bin: "{{ _home }}/.local/bin"
 
 # Machine class — override per host/group
 machine_class: "Personal"
@@ -64,7 +65,5 @@ npm_global_tools:
 external_repos:
   - repo: "https://github.com/HexSleeves/nvim.git"
     dest: "{{ xdg_config_home }}/nvim"
-    update: false
   - repo: "https://github.com/HexSleeves/zdotdir.git"
     dest: "{{ xdg_config_home }}/zsh"
-    update: false

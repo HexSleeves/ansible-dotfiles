@@ -1,23 +1,34 @@
 ---
+- name: Check if Tailscale is installed
+  ansible.builtin.command:
+    cmd: which tailscale
+  register: tailscale_check
+  changed_when: false
+  failed_when: false
+
 - name: Install Tailscale (macOS)
   community.general.homebrew:
     name: tailscale
     state: present
-  when: ansible_os_family == "Darwin"
+  when:
+    - ansible_facts['os_family'] == "Darwin"
+    - tailscale_check.rc != 0
 
 - name: Add Tailscale apt repo (Debian/Ubuntu)
-  when: ansible_os_family == "Debian"
+  when:
+    - ansible_facts['os_family'] == "Debian"
+    - tailscale_check.rc != 0
   block:
     - name: Add Tailscale GPG key
       ansible.builtin.get_url:
-        url: "https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}.noarmor.gpg"
+        url: "https://pkgs.tailscale.com/stable/{{ ansible_facts['distribution'] | lower }}/{{ ansible_facts['distribution_release'] }}.noarmor.gpg"
         dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
         mode: "0644"
       become: true
 
     - name: Add Tailscale repository
       ansible.builtin.apt_repository:
-        repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main"
+        repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/{{ ansible_facts['distribution'] | lower }} {{ ansible_facts['distribution_release'] }} main"
         state: present
       become: true
 
@@ -27,6 +38,7 @@
         state: present
         update_cache: true
       become: true
+  tags: [packages, bootstrap]
 
 - name: Enable and start tailscaled (Linux)
   ansible.builtin.systemd:
@@ -34,4 +46,6 @@
     enabled: true
     state: started
   become: true
-  when: ansible_os_family != "Darwin"
+  when:
+    - ansible_facts['os_family'] != "Darwin"
+    - tailscale_check.rc != 0

@@ -2,7 +2,7 @@
 - name: Install mise
   ansible.builtin.shell:
     cmd: curl https://mise.run | sh
-    creates: "{{ ansible_env.HOME }}/.local/bin/mise"
+    creates: "{{ _home }}/.local/bin/mise"
   environment:
     MISE_INSTALL_PATH: "{{ local_bin }}/mise"
 
@@ -24,12 +24,12 @@
 - name: Install cargo-binstall
   ansible.builtin.command:
     cmd: "{{ local_bin }}/mise exec rust -- cargo install cargo-binstall"
-    creates: "{{ ansible_env.HOME }}/.cargo/bin/cargo-binstall"
+    creates: "{{ _home }}/.cargo/bin/cargo-binstall"
   when: machine_class == "Personal"
 
 - name: Install cargo tools via cargo-binstall
   ansible.builtin.command:
-    cmd: "{{ ansible_env.HOME }}/.cargo/bin/cargo binstall --no-confirm --quiet {{ item }}"
+    cmd: "{{ _home }}/.cargo/bin/cargo binstall --no-confirm --quiet {{ item }}"
   loop: "{{ cargo_tools }}"
   when: machine_class == "Personal"
   register: cargo_install
