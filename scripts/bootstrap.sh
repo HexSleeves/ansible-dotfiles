@@ -12,19 +12,28 @@ install_ansible() {
         return
     fi
 
-    echo "Installing Ansible..."
-    if command -v brew >/dev/null 2>&1; then
-        brew install ansible
-    elif command -v pip3 >/dev/null 2>&1; then
-        pip3 install --user ansible
-    elif command -v apt-get >/dev/null 2>&1; then
-        sudo apt-get update && sudo apt-get install -y ansible
-    elif command -v dnf >/dev/null 2>&1; then
-        sudo dnf install -y ansible
-    else
-        echo "ERROR: Cannot install Ansible — no package manager found." >&2
-        exit 1
+    echo "Installing Ansible via pipx..."
+    if ! command -v pipx >/dev/null 2>&1; then
+        if command -v brew >/dev/null 2>&1; then
+            brew install pipx
+        elif command -v apt-get >/dev/null 2>&1; then
+            sudo apt-get update && sudo apt-get install -y pipx
+        elif command -v dnf >/dev/null 2>&1; then
+            sudo dnf install -y pipx
+        else
+            echo "ERROR: Cannot install pipx." >&2; exit 1
+        fi
+        pipx ensurepath
     fi
+
+    pipx install ansible
+
+    # pipx only symlinks the main entry point; expose all ansible-* binaries
+    local pipx_bin="$HOME/.local/share/pipx/venvs/ansible/bin"
+    for bin in ansible ansible-vault ansible-playbook ansible-galaxy \
+               ansible-config ansible-inventory ansible-doc ansible-console ansible-pull; do
+        ln -sf "$pipx_bin/$bin" "$HOME/.local/bin/$bin"
+    done
 }
 
 install_collections() {
