@@ -1,4 +1,0 @@
-# Example Solace shell config (keep the real file untracked).
-# Copy to solace.zsh and fill values.
-
-# export NPM_TOKEN="npm_..."

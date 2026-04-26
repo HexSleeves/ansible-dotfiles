@@ -1,6 +1,6 @@
 ---
-# Chezmoi dotfiles repo — set to your chezmoi repo URL to enable init/update
-# chezmoi_repo: "https://github.com/HexSleeves/dotfiles"
+# Chezmoi dotfiles repo
+chezmoi_repo: "git@github.com:HexSleeves/dotfiles.git"
 
 # Identity
 user_name: "Jacob LeCoq"

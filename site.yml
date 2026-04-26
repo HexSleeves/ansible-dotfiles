@@ -22,20 +22,11 @@
     - role: mise
       tags: [mise, tools]
 
-    - role: shell
-      tags: [shell, dotfiles]
-
-    - role: git
-      tags: [git, dotfiles]
-
     - role: ssh
       tags: [ssh, secrets]
 
     - role: gpg
       tags: [gpg, secrets]
-
-    - role: tools
-      tags: [tools, dotfiles, niri]
 
     - role: secrets
       tags: [secrets]

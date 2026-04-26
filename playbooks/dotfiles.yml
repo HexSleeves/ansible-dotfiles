@@ -1,11 +1,9 @@
 ---
-# Idempotent dotfiles-only deploy (no package installation)
-- name: Deploy dotfiles
+# Dotfiles-only deploy — runs chezmoi apply
+- name: Deploy dotfiles via chezmoi
   hosts: local
   gather_facts: true
 
   roles:
-    - role: shell
-    - role: git
-    - role: tools
+    - role: chezmoi
     - role: secrets

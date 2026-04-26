@@ -92,9 +92,10 @@ base64 -w0 ~/.local/share/chezmoi/home/bootstrap/gpg/gpg-keyring.tgz.gpg | \
 | Tag | What runs |
 |-----|-----------|
 | `bootstrap` | common + packages |
-| `dotfiles` | shell + git + tools + secrets |
+| `dotfiles` | chezmoi apply + secrets |
 | `packages` | packages + mise |
 | `secrets` | ssh + gpg + secrets |
+| `chezmoi` | chezmoi install + init/update |
 | `macos` | macOS-specific tasks |
 | `network` | tailscale |
 | Individual role names | that role only |
