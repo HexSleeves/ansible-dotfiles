@@ -17,7 +17,7 @@
     path: "{{ _home }}/.ssh/sockets"
     mode: "0700"
 
-- name: Repair 1Password apt repository metadata (Debian/Ubuntu)
+- name: Set up 1Password apt repository and install packages (Debian/Ubuntu)
   become: true
   when: ansible_facts['os_family'] == "Debian"
   tags: [packages, bootstrap]
@@ -32,12 +32,20 @@
         path: /etc/apt/sources.list.d/1password.list
       register: common_1password_list
 
+    - name: Check 1Password apt keyring
+      ansible.builtin.stat:
+        path: /usr/share/keyrings/1password-archive-keyring.gpg
+      register: common_1password_keyring
+
     - name: Download 1Password apt signing key
       ansible.builtin.get_url:
         url: https://downloads.1password.com/linux/keys/1password.asc
         dest: /tmp/1password-archive-keyring.asc
         mode: "0644"
-      when: common_1password_sources.stat.exists or common_1password_list.stat.exists
+      when: >-
+        not common_1password_keyring.stat.exists
+        or common_1password_sources.stat.exists
+        or common_1password_list.stat.exists
       register: common_1password_key_download
 
     - name: Install 1Password apt signing key
@@ -47,13 +55,13 @@
           --output /usr/share/keyrings/1password-archive-keyring.gpg
           /tmp/1password-archive-keyring.asc
       changed_when: common_1password_key_download.changed
-      when: common_1password_sources.stat.exists or common_1password_list.stat.exists
+      when: common_1password_key_download is not skipped
 
     - name: Remove temporary 1Password apt signing key
       ansible.builtin.file:
         path: /tmp/1password-archive-keyring.asc
         state: absent
-      when: common_1password_sources.stat.exists or common_1password_list.stat.exists
+      when: common_1password_key_download is not skipped
 
     - name: Remove duplicate legacy 1Password apt source
       ansible.builtin.file:
@@ -62,6 +70,23 @@
       when:
         - common_1password_sources.stat.exists
         - common_1password_list.stat.exists
+
+    - name: Add 1Password apt repository
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [arch=amd64 signed-by=/usr/share/keyrings/1password-archive-keyring.gpg]
+          https://downloads.1password.com/linux/debian/amd64 stable main
+        filename: 1password
+        state: present
+      when: not common_1password_sources.stat.exists
+
+    - name: Install 1Password desktop app and CLI via apt
+      ansible.builtin.apt:
+        name:
+          - 1password
+          - 1password-cli
+        state: present
+        update_cache: true
 
 - name: Install base packages (Debian/Ubuntu)
   become: true
