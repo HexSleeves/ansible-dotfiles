@@ -45,7 +45,7 @@
 
     - role: macos
       tags: [macos]
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - role: tailscale
       tags: [tailscale, network]
