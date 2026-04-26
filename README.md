@@ -12,6 +12,12 @@ Migrated from chezmoi. Supports macOS and Linux (Debian/Arch/RHEL families).
 ## Quick Start
 
 ```bash
+# One-command install from a fresh machine
+curl -fsSL https://raw.githubusercontent.com/HexSleeves/ansible-dotfiles/main/scripts/install.sh | bash
+
+# Pass through ansible-playbook args if needed
+curl -fsSL https://raw.githubusercontent.com/HexSleeves/ansible-dotfiles/main/scripts/install.sh | bash -s -- --tags dotfiles
+
 # 1. Install Ansible Galaxy collections
 ansible-galaxy collection install -r requirements.yml
 
