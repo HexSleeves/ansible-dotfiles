@@ -1,5 +1,5 @@
 ---
-# First-time machine setup: packages + secrets + dotfiles
+# First-time machine setup
 - name: Bootstrap new machine
   hosts: local
   gather_facts: true
@@ -8,13 +8,11 @@
     - role: common
     - role: packages
     - role: mise
-    - role: shell
-    - role: git
     - role: ssh
     - role: gpg
-    - role: tools
+    - role: chezmoi
     - role: secrets
     - role: external
     - role: macos
-      when: ansible_facts["os_family"] == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
     - role: tailscale
