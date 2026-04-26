@@ -5,3 +5,8 @@
 __pycache__/
 .firecrawl/
 *.log
+
+# Files with employer/sensitive config — managed locally, not tracked
+roles/tools/files/aws/private_config
+roles/tools/files/pilot/config.yaml
+private_*
