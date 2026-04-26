@@ -40,6 +40,9 @@
     - role: secrets
       tags: [secrets]
 
+    - role: chezmoi
+      tags: [chezmoi, dotfiles]
+
     - role: external
       tags: [external]
 

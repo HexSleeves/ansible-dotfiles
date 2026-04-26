@@ -8,6 +8,7 @@ tap "yakitrak/yakitrak"
 
 # ── Cross-platform ────────────────────────────────────────────────────────────
 brew "age"
+brew "chezmoi"
 brew "ast-grep"
 brew "atuin"
 brew "awscli"

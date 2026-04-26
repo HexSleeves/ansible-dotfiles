@@ -1,0 +1,5 @@
+---
+# URL of your chezmoi dotfiles repo.
+# Leave empty to skip init/update (install only).
+# Example: https://github.com/HexSleeves/dotfiles
+chezmoi_repo: ""
