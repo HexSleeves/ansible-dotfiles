@@ -6,8 +6,10 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_DIR"
 
+log() { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*"; }
+
 install_ansible() {
-    echo "Installing Ansible via pipx..."
+    log "Installing Ansible via pipx..."
     if ! command -v pipx >/dev/null 2>&1; then
         if command -v brew >/dev/null 2>&1; then
             brew install pipx
@@ -16,7 +18,7 @@ install_ansible() {
         elif command -v dnf >/dev/null 2>&1; then
             sudo dnf install -y pipx
         else
-            echo "ERROR: Cannot install pipx." >&2; exit 1
+            log "ERROR: Cannot install pipx." >&2; exit 1
         fi
         pipx ensurepath
     fi
@@ -35,15 +37,15 @@ install_ansible() {
 }
 
 install_collections() {
-    echo "Installing Ansible Galaxy collections..."
+    log "Installing Ansible Galaxy collections..."
     ansible-galaxy collection install -r requirements.yml --upgrade
 }
 
 verify_1password() {
     if ! command -v op >/dev/null 2>&1; then
-        echo "WARNING: 1Password CLI (op) not found."
-        echo "  Install it, then authenticate: op signin"
-        echo "  Or set ANSIBLE_VAULT_PASSWORD_FILE to a local password file."
+        log "WARNING: 1Password CLI (op) not found."
+        log "  Install it, then authenticate: op signin"
+        log "  Or set ANSIBLE_VAULT_PASSWORD_FILE to a local password file."
     fi
 }
 
@@ -51,5 +53,5 @@ install_ansible
 install_collections
 verify_1password
 
-echo "Running site.yml..."
+log "Running site.yml..."
 ansible-playbook site.yml --diff "$@"

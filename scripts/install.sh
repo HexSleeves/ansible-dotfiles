@@ -9,14 +9,9 @@ REPO_URL="${ANSIBLE_DOTFILES_REPO:-https://github.com/HexSleeves/ansible-dotfile
 REPO_BRANCH="${ANSIBLE_DOTFILES_BRANCH:-main}"
 TARGET_DIR="${ANSIBLE_DOTFILES_DIR:-$HOME/Developer/ansible-dotfiles}"
 
-log() {
-    printf '[ansible-dotfiles] %s\n' "$*"
-}
+log() { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*"; }
 
-fail() {
-    printf '[ansible-dotfiles] ERROR: %s\n' "$*" >&2
-    exit 1
-}
+fail() { printf '[%s] ERROR: %s\n' "$(date +%H:%M:%S)" "$*" >&2; exit 1; }
 
 install_git() {
     if command -v git >/dev/null 2>&1; then
