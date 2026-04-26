@@ -1,55 +1,55 @@
 ---
-- name: Install packages (macOS)
-  when: ansible_os_family == "Darwin"
-  block:
-    - name: Install Homebrew
-      ansible.builtin.shell:
-        cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        creates: /opt/homebrew/bin/brew
-      environment:
-        NONINTERACTIVE: "1"
-
-    - name: Install Brewfile packages
-      community.general.homebrew_tap:
-        name: "{{ item }}"
-        state: present
-      loop: "{{ homebrew_taps }}"
-
-    - name: Run brew bundle
-      ansible.builtin.command:
-        cmd: brew bundle --file={{ role_path }}/files/Brewfile --no-lock
-      register: brew_bundle
-      changed_when: "'Installing' in brew_bundle.stdout or 'Upgrading' in brew_bundle.stdout"
-
-- name: Install packages (Debian/Ubuntu)
+# Bootstrap: minimal native packages Homebrew itself needs
+- name: Install build dependencies (Debian/Ubuntu)
   become: true
-  when: ansible_os_family == "Debian"
-  block:
-    - name: Update apt cache
-      ansible.builtin.apt:
-        update_cache: true
-        cache_valid_time: 3600
+  ansible.builtin.apt:
+    name: "{{ apt_bootstrap_packages }}"
+    state: present
+    update_cache: true
+  when: ansible_facts['os_family'] == "Debian"
+  tags: [packages, bootstrap]
 
-    - name: Install apt packages
-      ansible.builtin.apt:
-        name: "{{ apt_packages }}"
-        state: present
-
-- name: Install packages (Arch)
+- name: Install build dependencies (Arch)
   become: true
-  when: ansible_distribution in ["Archlinux", "Arch Linux", "EndeavourOS", "Manjaro"]
-  block:
-    - name: Install pacman packages
-      community.general.pacman:
-        name: "{{ pacman_packages }}"
-        state: present
-        update_cache: true
+  community.general.pacman:
+    name: "{{ pacman_bootstrap_packages }}"
+    state: present
+    update_cache: true
+  when: ansible_facts['distribution'] in ["Archlinux", "Arch Linux", "EndeavourOS", "Manjaro"]
+  tags: [packages, bootstrap]
 
-- name: Install packages (RHEL/Fedora)
+- name: Install build dependencies (RHEL/Fedora)
   become: true
-  when: ansible_os_family == "RedHat"
-  block:
-    - name: Install dnf packages
-      ansible.builtin.dnf:
-        name: "{{ dnf_packages }}"
-        state: present
+  ansible.builtin.dnf:
+    name: "{{ dnf_bootstrap_packages }}"
+    state: present
+  when: ansible_facts['os_family'] == "RedHat"
+  tags: [packages, bootstrap]
+
+# Homebrew: primary package manager on both macOS and Linux
+- name: Install Homebrew (macOS)
+  ansible.builtin.shell:
+    cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    creates: /opt/homebrew/bin/brew
+  environment:
+    NONINTERACTIVE: "1"
+  when: ansible_facts['os_family'] == "Darwin"
+  tags: [packages, bootstrap]
+
+- name: Install Homebrew (Linux)
+  ansible.builtin.shell:
+    cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    creates: /home/linuxbrew/.linuxbrew/bin/brew
+  environment:
+    NONINTERACTIVE: "1"
+  when: ansible_facts['os_family'] != "Darwin"
+  tags: [packages, bootstrap]
+
+- name: Run brew bundle
+  ansible.builtin.command:
+    cmd: brew bundle --file={{ role_path }}/files/Brewfile --no-lock
+  register: brew_bundle
+  changed_when: "'Installing' in brew_bundle.stdout or 'Upgrading' in brew_bundle.stdout"
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:/opt/homebrew/bin:{{ ansible_env.PATH }}"
+  tags: [packages]

@@ -30,7 +30,7 @@ ansible-playbook site.yml --tags secrets
 
 ## Repo Structure
 
-```
+```bash
 ansible-dotfiles/
 ├── ansible.cfg              # vault_password_file points to .vault-password-op.sh
 ├── .vault-password-op.sh    # retrieves vault password from 1Password (not in git)

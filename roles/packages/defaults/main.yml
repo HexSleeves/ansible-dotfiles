@@ -1,82 +1,22 @@
 ---
-homebrew_taps:
-  - antoniorodr/memo
-  - hashicorp/tap
-  - openhue/cli
-  - steipete/tap
-  - yakitrak/yakitrak
+# Minimal packages needed to bootstrap Homebrew itself.
+# Everything else is installed via brew bundle.
 
-apt_packages:
-  - age
-  - atuin
-  - bat
+apt_bootstrap_packages:
+  - build-essential
   - curl
-  - direnv
-  - fd-find
-  - fzf
   - git
-  - git-delta
-  - gnupg
-  - htop
-  - jq
-  - just
-  - mosh
-  - neovim
-  - niri
-  - ripgrep
-  - shellcheck
-  - shfmt
-  - tmux
-  - tree
-  - wget
-  - xwayland-satellite
-  - zoxide
-  - zsh
+  - procps
+  - file
 
-pacman_packages:
-  - age
-  - atuin
-  - bat
+pacman_bootstrap_packages:
+  - base-devel
   - curl
-  - direnv
-  - fd
-  - fzf
   - git
-  - gnupg
-  - htop
-  - jq
-  - just
-  - mosh
-  - neovim
-  - niri
-  - ripgrep
-  - shellcheck
-  - shfmt
-  - tmux
-  - tree
-  - wget
-  - xwayland-satellite
-  - zoxide
-  - zsh
 
-dnf_packages:
-  - age
-  - bat
+dnf_bootstrap_packages:
+  - gcc
+  - gcc-c++
+  - make
   - curl
-  - direnv
-  - fd-find
-  - fzf
   - git
-  - gnupg2
-  - htop
-  - jq
-  - mosh
-  - neovim
-  - ripgrep
-  - ShellCheck
-  - shfmt
-  - tmux
-  - tree
-  - wget
-  - zoxide
-  - zsh
