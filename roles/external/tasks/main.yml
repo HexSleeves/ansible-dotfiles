@@ -19,8 +19,8 @@
     checksum: sha256:6063d4f2af8a82a5f4bba0831e165de9381660aa8b41df4816d0106a265b07d5
     mode: "0644"
   when:
-    - ansible_os_family != "Darwin"
-    - ansible_architecture == "x86_64"
+    - ansible_facts["os_family"] != "Darwin"
+    - ansible_facts["architecture"] == "x86_64"
     - not external_glow_bin.stat.exists
 
 - name: Extract glow binary (Linux)
@@ -30,8 +30,8 @@
     include: glow
     remote_src: true
   when:
-    - ansible_os_family != "Darwin"
-    - ansible_architecture == "x86_64"
+    - ansible_facts["os_family"] != "Darwin"
+    - ansible_facts["architecture"] == "x86_64"
     - not external_glow_bin.stat.exists
 
 - name: Check if Monaspace fonts installed
@@ -45,7 +45,7 @@
     dest: /tmp/monaspace.zip
     mode: "0644"
   when:
-    - ansible_os_family != "Darwin"
+    - ansible_facts["os_family"] != "Darwin"
     - not external_monaspace_dir.stat.exists
 
 - name: Create fonts dir
@@ -54,7 +54,7 @@
     state: directory
     mode: "0755"
   when:
-    - ansible_os_family != "Darwin"
+    - ansible_facts["os_family"] != "Darwin"
     - not external_monaspace_dir.stat.exists
 
 - name: Extract Monaspace fonts (Linux)
@@ -65,5 +65,5 @@
     extra_opts: ["--strip-components=1"]
   notify: Refresh font cache
   when:
-    - ansible_os_family != "Darwin"
+    - ansible_facts["os_family"] != "Darwin"
     - not external_monaspace_dir.stat.exists

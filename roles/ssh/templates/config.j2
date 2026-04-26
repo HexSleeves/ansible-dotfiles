@@ -1,4 +1,4 @@
-{% if ansible_os_family == "Darwin" %}
+{% if ansible_facts['os_family'] == "Darwin" %}
 # Added by OrbStack: 'orb' SSH host for Linux machines
 Include ~/.orbstack/ssh/config
 {% endif %}
@@ -9,7 +9,7 @@ Include ~/.orbstack/ssh/config
 
 Host *
     AddKeysToAgent yes
-{% if ansible_os_family == "Darwin" %}
+{% if ansible_facts['os_family'] == "Darwin" %}
     UseKeychain yes
 {% endif %}
     IdentitiesOnly yes
@@ -36,7 +36,7 @@ Host *
 
 # 1Password SSH agent
 Host *
-{% if ansible_os_family == "Darwin" %}
+{% if ansible_facts['os_family'] == "Darwin" %}
     IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 {% else %}
     IdentityAgent ~/.1password/agent.sock
