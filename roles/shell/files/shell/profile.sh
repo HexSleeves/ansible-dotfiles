@@ -43,4 +43,11 @@ export PAGER="${PAGER:-less}"
 export LESS="${LESS:--FRX}"
 export BAT_THEME="${BAT_THEME:-TwoDark}"
 export FZF_DEFAULT_COMMAND="${FZF_DEFAULT_COMMAND:-fd --type f --hidden --follow --exclude .git}"
+export GNUPGHOME="${GNUPGHOME:-$HOME/.local/share/gnupg}"
+
+if command -v tty >/dev/null 2>&1; then
+  GPG_TTY="$(tty)"
+  export GPG_TTY
+fi
+
 export HOMEBREW_NO_ANALYTICS=1

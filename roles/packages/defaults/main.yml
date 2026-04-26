@@ -1,20 +1,19 @@
 ---
-# Minimal packages needed to bootstrap Homebrew itself.
 # Everything else is installed via brew bundle.
 
-apt_bootstrap_packages:
+packages_apt_bootstrap_packages:
   - build-essential
   - curl
   - git
   - procps
   - file
 
-pacman_bootstrap_packages:
+packages_pacman_bootstrap_packages:
   - base-devel
   - curl
   - git
 
-dnf_bootstrap_packages:
+packages_dnf_bootstrap_packages:
   - gcc
   - gcc-c++
   - make

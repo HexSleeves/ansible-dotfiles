@@ -3,24 +3,25 @@
   ansible.builtin.git:
     repo: "{{ item.repo }}"
     dest: "{{ item.dest }}"
-    update: false
-    version: HEAD
+    update: "{{ external_repos_update | default(false) }}"
+    version: "{{ item.version | default('HEAD') }}"
   loop: "{{ external_repos }}"
 
 - name: Check if glow already installed
   ansible.builtin.stat:
     path: "{{ local_bin }}/glow"
-  register: glow_bin
+  register: external_glow_bin
 
 - name: Download glow binary (Linux x86_64)
   ansible.builtin.get_url:
     url: "https://github.com/charmbracelet/glow/releases/download/v2.1.2/glow_2.1.2_Linux_x86_64.tar.gz"
     dest: /tmp/glow.tar.gz
+    checksum: sha256:6063d4f2af8a82a5f4bba0831e165de9381660aa8b41df4816d0106a265b07d5
     mode: "0644"
   when:
     - ansible_os_family != "Darwin"
     - ansible_architecture == "x86_64"
-    - not glow_bin.stat.exists
+    - not external_glow_bin.stat.exists
 
 - name: Extract glow binary (Linux)
   ansible.builtin.unarchive:
@@ -31,12 +32,12 @@
   when:
     - ansible_os_family != "Darwin"
     - ansible_architecture == "x86_64"
-    - not glow_bin.stat.exists
+    - not external_glow_bin.stat.exists
 
 - name: Check if Monaspace fonts installed
   ansible.builtin.stat:
     path: "{{ xdg_data_home }}/fonts/Monaspace"
-  register: monaspace_dir
+  register: external_monaspace_dir
 
 - name: Download Monaspace fonts (Linux)
   ansible.builtin.get_url:
@@ -45,7 +46,7 @@
     mode: "0644"
   when:
     - ansible_os_family != "Darwin"
-    - not monaspace_dir.stat.exists
+    - not external_monaspace_dir.stat.exists
 
 - name: Create fonts dir
   ansible.builtin.file:
@@ -54,7 +55,7 @@
     mode: "0755"
   when:
     - ansible_os_family != "Darwin"
-    - not monaspace_dir.stat.exists
+    - not external_monaspace_dir.stat.exists
 
 - name: Extract Monaspace fonts (Linux)
   ansible.builtin.unarchive:
@@ -62,14 +63,7 @@
     dest: "{{ xdg_data_home }}/fonts/Monaspace"
     remote_src: true
     extra_opts: ["--strip-components=1"]
+  notify: Refresh font cache
   when:
     - ansible_os_family != "Darwin"
-    - not monaspace_dir.stat.exists
-
-- name: Refresh font cache (Linux)
-  ansible.builtin.command:
-    cmd: fc-cache -f
-  when:
-    - ansible_os_family != "Darwin"
-    - not monaspace_dir.stat.exists
-  changed_when: true
+    - not external_monaspace_dir.stat.exists

@@ -5,6 +5,7 @@
   register: gpg_check
   changed_when: false
   failed_when: false
+  tags: [packages, bootstrap]
 
 - name: Ensure GPG is installed
   ansible.builtin.package:
@@ -13,57 +14,87 @@
   become: true
   when:
     - ansible_facts['os_family'] != "Darwin"
-    - gpg_check.rc != 0
+    - gpg_check.rc | default(1) != 0
   tags: [packages, bootstrap]
 
 - name: Ensure GPG is installed (macOS)
   community.general.homebrew:
     name: gnupg
     state: present
-  when: ansible_os_family == "Darwin"
+  when: ansible_facts['os_family'] == "Darwin"
+  tags: [packages, bootstrap]
 
 - name: Create GPG export dir
   ansible.builtin.file:
-    path: "{{ _home }}/.local/share/gnupg/.exported-keyring"
+    path: "{{ xdg_data_home }}/gnupg/.exported-keyring"
     state: directory
     mode: "0700"
 
-- name: Write GPG keyring archive from vault
-  ansible.builtin.copy:
-    content: "{{ vault_gpg_keyring_b64 | b64decode }}"
-    dest: /tmp/gpg-keyring.tgz.gpg
-    mode: "0600"
-  when: vault_gpg_keyring_b64 | length > 0
+- name: Check for configured GPG signing secret key
+  ansible.builtin.command:
+    cmd: >-
+      gpg --homedir {{ (xdg_data_home + '/gnupg') | quote }}
+      --list-secret-keys {{ signing_key | quote }}
+  register: gpg_signing_key_check
+  changed_when: false
+  failed_when: false
+
+- name: Import GPG keyring from vault
+  when:
+    - vault_gpg_keyring_b64 | default('') | length > 0
+    - gpg_signing_key_check.rc != 0
   no_log: true
+  block:
+    - name: Create temporary GPG import dir
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: gpg-import
+      register: gpg_import_tmp
 
-- name: Decrypt and extract GPG keyring
-  ansible.builtin.shell: |
-    gpg --batch --passphrase {{ vault_gpg_passphrase | quote }} \
-        --output /tmp/gpg-keyring.tgz \
-        --decrypt /tmp/gpg-keyring.tgz.gpg
-    tar -xzf /tmp/gpg-keyring.tgz -C /tmp/gpg-extract/
-  args:
-    creates: "{{ _home }}/.gnupg/trustdb.gpg"
-  when: vault_gpg_keyring_b64 | length > 0
-  no_log: true
+    - name: Write GPG keyring archive from vault
+      ansible.builtin.copy:
+        content: "{{ vault_gpg_keyring_b64 | b64decode }}"
+        dest: "{{ gpg_import_tmp.path }}/gpg-keyring.tgz.gpg"
+        mode: "0600"
 
-- name: Import GPG keys
-  ansible.builtin.shell: |
-    mkdir -p /tmp/gpg-extract
-    gpg --import /tmp/gpg-extract/*.asc 2>/dev/null || true
-    if [ -f /tmp/gpg-extract/ownertrust.txt ]; then
-      gpg --import-ownertrust /tmp/gpg-extract/ownertrust.txt
-    fi
-  args:
-    creates: "{{ _home }}/.gnupg/trustdb.gpg"
-  when: vault_gpg_keyring_b64 | length > 0
+    - name: Decrypt and extract GPG keyring
+      ansible.builtin.shell: |
+        set -o pipefail
+        gpg --homedir {{ (xdg_data_home + '/gnupg') | quote }} \
+            --batch \
+            --pinentry-mode loopback \
+            --passphrase {{ vault_gpg_passphrase | default('') | quote }} \
+            --output "{{ gpg_import_tmp.path }}/gpg-keyring.tgz" \
+            --decrypt "{{ gpg_import_tmp.path }}/gpg-keyring.tgz.gpg"
+        mkdir -p "{{ gpg_import_tmp.path }}/extract"
+        tar -xzf "{{ gpg_import_tmp.path }}/gpg-keyring.tgz" -C "{{ gpg_import_tmp.path }}/extract"
+      args:
+        executable: /bin/bash
+      changed_when: true
 
-- name: Clean up temp GPG files
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
-  loop:
-    - /tmp/gpg-keyring.tgz.gpg
-    - /tmp/gpg-keyring.tgz
-    - /tmp/gpg-extract
-  when: vault_gpg_keyring_b64 | length > 0
+    - name: Import GPG keys
+      ansible.builtin.shell: |
+        set -o pipefail
+        gpg --homedir {{ (xdg_data_home + '/gnupg') | quote }} \
+            --batch \
+            --pinentry-mode loopback \
+            --passphrase {{ vault_gpg_passphrase | default('') | quote }} \
+            --import "{{ gpg_import_tmp.path }}"/extract/keyring/secret-keys.asc
+        gpg --homedir {{ (xdg_data_home + '/gnupg') | quote }} \
+            --batch \
+            --pinentry-mode loopback \
+            --passphrase {{ vault_gpg_passphrase | default('') | quote }} \
+            --import "{{ gpg_import_tmp.path }}"/extract/keyring/public-keys.asc
+        if [ -f "{{ gpg_import_tmp.path }}/extract/keyring/ownertrust.txt" ]; then
+          gpg --homedir {{ (xdg_data_home + '/gnupg') | quote }} \
+              --import-ownertrust "{{ gpg_import_tmp.path }}/extract/keyring/ownertrust.txt"
+        fi
+      args:
+        executable: /bin/bash
+      changed_when: true
+  always:
+    - name: Clean up temporary GPG import dir
+      ansible.builtin.file:
+        path: "{{ gpg_import_tmp.path }}"
+        state: absent
+      when: gpg_import_tmp.path is defined

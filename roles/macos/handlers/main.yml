@@ -1,1 +1,10 @@
 ---
+- name: Restart affected macOS services
+  ansible.builtin.command:
+    cmd: "killall {{ item }}"
+  loop:
+    - Finder
+    - Dock
+    - SystemUIServer
+  failed_when: false
+  changed_when: true

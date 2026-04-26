@@ -1,7 +1,9 @@
+---
 # lazygit config — overrides only; anything omitted uses compiled defaults.
 # Reference:    https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
 # Pagers:       https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Pagers.md
 # Custom cmds:  https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Command_Keybindings.md
+# yaml-language-server: $schema=https://json.schemastore.org/lazygit.json
 
 gui:
   nerdFontsVersion: "3"
@@ -90,11 +92,16 @@ customCommands:
         title: 'Branch type'
         key: Type
         options:
-          - { name: feature,  value: feature }
-          - { name: fix,      value: fix }
-          - { name: chore,    value: chore }
-          - { name: hotfix,   value: hotfix }
-          - { name: refactor, value: refactor }
+          - name: feature
+            value: feature
+          - name: fix
+            value: fix
+          - name: chore
+            value: chore
+          - name: hotfix
+            value: hotfix
+          - name: refactor
+            value: refactor
       - type: input
         title: 'Branch name (kebab-case)'
         key: Name
@@ -107,14 +114,22 @@ customCommands:
         title: 'Type'
         key: Type
         options:
-          - { name: feat,     value: feat }
-          - { name: fix,      value: fix }
-          - { name: chore,    value: chore }
-          - { name: docs,     value: docs }
-          - { name: refactor, value: refactor }
-          - { name: test,     value: test }
-          - { name: style,    value: style }
-          - { name: ci,       value: ci }
+          - name: feat
+            value: feat
+          - name: fix
+            value: fix
+          - name: chore
+            value: chore
+          - name: docs
+            value: docs
+          - name: refactor
+            value: refactor
+          - name: test
+            value: test
+          - name: style
+            value: style
+          - name: ci
+            value: ci
       - type: input
         title: 'Commit message'
         key: Msg

@@ -16,7 +16,7 @@
     content: "{{ vault_ssh_key_ed25519 }}"
     dest: "{{ _home }}/.ssh/id_ed25519"
     mode: "0600"
-  when: vault_ssh_key_ed25519 | length > 0
+  when: vault_ssh_key_ed25519 | default('') | length > 0
   no_log: true
 
 - name: Deploy SSH private key (Bayer)
@@ -24,7 +24,7 @@
     content: "{{ vault_ssh_key_bayer }}"
     dest: "{{ _home }}/.ssh/id_bayer"
     mode: "0600"
-  when: vault_ssh_key_bayer | length > 0
+  when: vault_ssh_key_bayer | default('') | length > 0
   no_log: true
 
 - name: Copy SSH public key (ed25519)

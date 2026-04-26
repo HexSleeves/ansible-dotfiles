@@ -10,16 +10,34 @@
     mode: "0644"
   become: true
 
+- name: Check Spotlight indexing status for ~/Developer
+  ansible.builtin.command:
+    cmd: mdutil -s "{{ _home }}/Developer"
+  become: true
+  register: macos_spotlight_status
+  changed_when: false
+  failed_when: false
+
 - name: Disable Spotlight indexing for ~/Developer
   ansible.builtin.command:
-    cmd: mdutil -i off ~/Developer
+    cmd: mdutil -i off "{{ _home }}/Developer"
   become: true
+  when: "'Indexing enabled' in macos_spotlight_status.stdout"
   changed_when: true
+
+- name: Check macOS firewall SSH application entry
+  ansible.builtin.command:
+    cmd: /usr/libexec/ApplicationFirewall/socketfilterfw --listapps
+  become: true
+  register: macos_firewall_apps
+  changed_when: false
+  failed_when: false
 
 - name: Allow SSH through macOS firewall
   ansible.builtin.command:
     cmd: /usr/libexec/ApplicationFirewall/socketfilterfw --add /usr/sbin/sshd
   become: true
+  when: "'/usr/sbin/sshd' not in macos_firewall_apps.stdout"
   changed_when: true
 
 - name: Apply macOS system defaults
@@ -29,13 +47,4 @@
     type: "{{ item.type }}"
     value: "{{ item.value }}"
   loop: "{{ macos_defaults }}"
-
-- name: Restart affected macOS services
-  ansible.builtin.command:
-    cmd: "killall {{ item }}"
-  loop:
-    - Finder
-    - Dock
-    - SystemUIServer
-  failed_when: false
-  changed_when: true
+  notify: Restart affected macOS services

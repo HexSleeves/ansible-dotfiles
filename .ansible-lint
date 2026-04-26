@@ -1,0 +1,12 @@
+---
+profile: production
+exclude_paths:
+  - .ansible_facts/
+  - .firecrawl/
+  - inventory/group_vars/all/vault.yml
+warn_list:
+  - command-instead-of-shell
+  - no-changed-when
+  - package-latest
+skip_list:
+  - yaml[line-length]

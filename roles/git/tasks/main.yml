@@ -17,8 +17,10 @@
     dest: "{{ xdg_config_home }}/git/{{ item.dest }}"
     mode: "0644"
   loop:
-    - { src: themes.gitconfig, dest: themes.gitconfig }
-    - { src: ignore,           dest: ignore }
+    - src: themes.gitconfig
+      dest: themes.gitconfig
+    - src: ignore
+      dest: ignore
 
 - name: Create git config.local if absent
   ansible.builtin.copy:

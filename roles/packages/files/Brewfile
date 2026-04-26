@@ -82,7 +82,7 @@ brew "starkandwayne/cf/safe"
 brew "yakitrak/yakitrak/obsidian-cli"
 
 # ── Linux-only ────────────────────────────────────────────────────────────────
-on_linux do
+if RUBY_PLATFORM.include?("linux")
   brew "lld"
   brew "openjdk"
   brew "postgresql@18"
@@ -90,7 +90,7 @@ on_linux do
 end
 
 # ── macOS-only ────────────────────────────────────────────────────────────────
-on_macos do
+if RUBY_PLATFORM.include?("darwin")
   brew "cocoapods"
   brew "docker"
   brew "pinentry-mac"

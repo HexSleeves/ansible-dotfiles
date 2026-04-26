@@ -17,6 +17,52 @@
     path: "{{ _home }}/.ssh/sockets"
     mode: "0700"
 
+- name: Repair 1Password apt repository metadata (Debian/Ubuntu)
+  become: true
+  when: ansible_facts['os_family'] == "Debian"
+  tags: [packages, bootstrap]
+  block:
+    - name: Check 1Password deb822 source
+      ansible.builtin.stat:
+        path: /etc/apt/sources.list.d/1password.sources
+      register: common_1password_sources
+
+    - name: Check legacy 1Password apt source
+      ansible.builtin.stat:
+        path: /etc/apt/sources.list.d/1password.list
+      register: common_1password_list
+
+    - name: Download 1Password apt signing key
+      ansible.builtin.get_url:
+        url: https://downloads.1password.com/linux/keys/1password.asc
+        dest: /tmp/1password-archive-keyring.asc
+        mode: "0644"
+      when: common_1password_sources.stat.exists or common_1password_list.stat.exists
+      register: common_1password_key_download
+
+    - name: Install 1Password apt signing key
+      ansible.builtin.command:
+        cmd: >-
+          gpg --batch --yes --dearmor
+          --output /usr/share/keyrings/1password-archive-keyring.gpg
+          /tmp/1password-archive-keyring.asc
+      changed_when: common_1password_key_download.changed
+      when: common_1password_sources.stat.exists or common_1password_list.stat.exists
+
+    - name: Remove temporary 1Password apt signing key
+      ansible.builtin.file:
+        path: /tmp/1password-archive-keyring.asc
+        state: absent
+      when: common_1password_sources.stat.exists or common_1password_list.stat.exists
+
+    - name: Remove duplicate legacy 1Password apt source
+      ansible.builtin.file:
+        path: /etc/apt/sources.list.d/1password.list
+        state: absent
+      when:
+        - common_1password_sources.stat.exists
+        - common_1password_list.stat.exists
+
 - name: Install base packages (Debian/Ubuntu)
   become: true
   ansible.builtin.apt:

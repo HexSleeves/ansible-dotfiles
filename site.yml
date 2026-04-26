@@ -10,6 +10,7 @@
       delegate_to: localhost
       run_once: true
       changed_when: false
+      when: install_ansible_collections | default(false) | bool
 
   roles:
     - role: common

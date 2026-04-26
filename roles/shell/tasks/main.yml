@@ -11,14 +11,22 @@
     dest: "{{ _home }}/{{ item.dest }}"
     mode: "0644"
   loop:
-    - { src: zshrc,       dest: .zshrc }
-    - { src: zshenv,      dest: .zshenv }
-    - { src: zprofile,    dest: .zprofile }
-    - { src: profile,     dest: .profile }
-    - { src: bashrc,      dest: .bashrc }
-    - { src: bash_profile, dest: .bash_profile }
-    - { src: fzf.zsh,     dest: .fzf.zsh }
-    - { src: fzf.bash,    dest: .fzf.bash }
+    - src: zshrc
+      dest: .zshrc
+    - src: zshenv
+      dest: .zshenv
+    - src: zprofile
+      dest: .zprofile
+    - src: profile
+      dest: .profile
+    - src: bashrc
+      dest: .bashrc
+    - src: bash_profile
+      dest: .bash_profile
+    - src: fzf.zsh
+      dest: .fzf.zsh
+    - src: fzf.bash
+      dest: .fzf.bash
 
 - name: Copy ~/.config/shell/ files
   ansible.builtin.copy:

@@ -5,6 +5,7 @@
   register: tailscale_check
   changed_when: false
   failed_when: false
+  tags: [packages, bootstrap]
 
 - name: Install Tailscale (macOS)
   community.general.homebrew:
@@ -12,12 +13,14 @@
     state: present
   when:
     - ansible_facts['os_family'] == "Darwin"
-    - tailscale_check.rc != 0
+    - tailscale_check.rc | default(1) != 0
+  tags: [packages, bootstrap]
 
 - name: Add Tailscale apt repo (Debian/Ubuntu)
+  tags: [packages, bootstrap]
   when:
     - ansible_facts['os_family'] == "Debian"
-    - tailscale_check.rc != 0
+    - tailscale_check.rc | default(1) != 0
   block:
     - name: Add Tailscale GPG key
       ansible.builtin.get_url:
@@ -38,7 +41,6 @@
         state: present
         update_cache: true
       become: true
-  tags: [packages, bootstrap]
 
 - name: Enable and start tailscaled (Linux)
   ansible.builtin.systemd:
@@ -48,4 +50,5 @@
   become: true
   when:
     - ansible_facts['os_family'] != "Darwin"
-    - tailscale_check.rc != 0
+    - tailscale_check.rc | default(1) != 0
+  tags: [packages, bootstrap]
