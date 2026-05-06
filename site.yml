@@ -37,6 +37,9 @@
     - role: external
       tags: [external]
 
+    - role: distrobox
+      tags: [distrobox]
+
     - role: macos
       tags: [macos]
       when: ansible_facts['os_family'] == "Darwin"

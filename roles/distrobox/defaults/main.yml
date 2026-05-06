@@ -1,0 +1,9 @@
+---
+# Distrobox dev environment provisioning
+# Tag: distrobox  (skip with --skip-tags distrobox)
+
+distrobox_dev_image: "dev-base:latest"
+distrobox_dev_container: "dev"
+distrobox_dockerfile: "{{ lookup('env', 'HOME') }}/.config/distrobox/dev.Dockerfile"
+distrobox_build_context: "{{ lookup('env', 'HOME') }}/.config/distrobox"
+distrobox_build_image: false  # Set to true to rebuild the image

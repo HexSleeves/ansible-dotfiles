@@ -4,6 +4,7 @@
 packages_apt_bootstrap_packages:
   - build-essential
   - curl
+  - distrobox
   - git
   - procps
   - file

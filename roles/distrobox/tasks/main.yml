@@ -1,0 +1,40 @@
+---
+# Distrobox: build dev container and generate desktop entries
+
+- name: Check if dev-base image exists
+  ansible.builtin.command:
+    cmd: podman image exists {{ distrobox_dev_image }}
+  register: _dbx_image_check
+  failed_when: false
+  changed_when: false
+  tags: [distrobox]
+
+- name: Build dev-base container image
+  ansible.builtin.command:
+    cmd: podman build -t {{ distrobox_dev_image }} -f {{ distrobox_dockerfile }} {{ distrobox_build_context }}
+  when:
+    - distrobox_build_image | bool
+    - _dbx_image_check.rc != 0
+  tags: [distrobox, distrobox-build]
+
+- name: Check if dev container exists
+  ansible.builtin.command:
+    cmd: distrobox list --no-color
+  register: _dbx_list
+  changed_when: false
+  tags: [distrobox]
+
+- name: Create dev container
+  ansible.builtin.command:
+    cmd: distrobox create --name {{ distrobox_dev_container }} --image {{ distrobox_dev_image }} --yes
+  when: distrobox_dev_container not in _dbx_list.stdout
+  tags: [distrobox]
+
+- name: Generate desktop entry for dev container
+  ansible.builtin.command:
+    cmd: distrobox generate-entry {{ distrobox_dev_container }}
+  register: _dbx_entry
+  changed_when: "'generated' in _dbx_entry.stdout"
+  failed_when: false
+  when: distrobox_dev_container in _dbx_list.stdout
+  tags: [distrobox]
