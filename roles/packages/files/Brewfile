@@ -84,7 +84,7 @@ brew "starship"
 brew "stylua"
 brew "tailscale"
 brew "tealdeer"
-brew "terraform", link: false
+brew "hashicorp/tap/terraform", link: false
 brew "tfenv"
 brew "tmux"
 brew "tokei"
@@ -104,17 +104,17 @@ brew "gromgit/fuse/sshfs-mac"
 brew "hashicorp/tap/vault"
 brew "openhue/cli/openhue-cli"
 brew "starkandwayne/cf/safe"
-brew "steipete/tap/bird"
+brew "steipete/tap/birdclaw"
 brew "steipete/tap/gifgrep"
-brew "steipete/tap/goplaces"
-brew "steipete/tap/gogcli"
+# brew "steipete/tap/goplaces"  # removed from steipete/tap
+# brew "steipete/tap/gogcli"  # removed from steipete/tap
 brew "steipete/tap/imsg"
 brew "steipete/tap/ordercli", link: false
 brew "steipete/tap/peekaboo"
 brew "steipete/tap/remindctl"
 brew "steipete/tap/songsee"
 brew "steipete/tap/summarize"
-brew "steipete/tap/wacli"
+brew "steipete/tap/wacrawl"
 brew "veirt/veirt/weathr"
 brew "yakitrak/yakitrak/obsidian-cli"
 
@@ -144,7 +144,7 @@ if RUBY_PLATFORM.include?("darwin")
 
   # Casks
   cask "1password-cli"
-  cask "cursor"
+  # cask "cursor"  # already installed at /Applications/Cursor.app; brew re-link fails on xattr
   cask "codexbar"
   cask "dotnet-sdk"
   cask "font-caskaydia-cove-nerd-font"
