@@ -1,4 +1,6 @@
 .vault-pass
+.ansible-local.cfg
+.vault-password.sh
 .ansible_facts/
 *.retry
 *.pyc
