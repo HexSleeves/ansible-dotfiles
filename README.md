@@ -95,7 +95,6 @@ ansible-dotfiles/
 ```
 
 ---
-
 ## Roles
 
 ### `common`
@@ -168,6 +167,26 @@ cd ~/.local/share/chezmoi && git add -A && git commit -m "feat: add sometool con
 
 ---
 
+## Secrets Management
+
+Ansible vault is the canonical store for bootstrap secrets. Chezmoi should not
+carry a second copy of the GPG keyring archive.
+
+```bash
+# 1. Decrypt a chezmoi .age file
+chezmoi decrypt ~/.local/share/chezmoi/home/private_dot_ssh/encrypted_private_id_ed25519.age
+
+# 2. Encrypt the content with ansible-vault
+ansible-vault encrypt_string "$(chezmoi decrypt <path>.age)" --name 'vault_ssh_key_ed25519'
+
+# 3. Paste the output into inventory/group_vars/all/vault.yml
+
+# Refresh the GPG keyring vault entry from the local keyring:
+bash scripts/export-keys.sh --ansible-vault
+```
+
+---
+
 ### `ssh`
 
 Creates `~/.ssh` (mode `0700`) and `~/.ssh/sockets`. Templates `~/.ssh/config` with:
@@ -187,7 +206,7 @@ Deploys private keys from vault (mode `0600`):
 
 ### `gpg`
 
-Imports the full GPG keyring from vault. Skips if the signing key fingerprint (`F5B8831AED0743F77428AC154B696C8ED1B35912`) is already present. Uses `no_log: true` throughout. Temp files are cleaned in an `always` block.
+Imports the full GPG keyring from vault. Skips if the signing key fingerprint (`758709BBEB67145DE844FC85C61F052D671268B5`) is already present. Uses `no_log: true` throughout. Temp files are cleaned in an `always` block.
 
 ---
 

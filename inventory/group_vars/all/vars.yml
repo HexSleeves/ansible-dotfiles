@@ -5,8 +5,11 @@ chezmoi_repo: "git@github.com:HexSleeves/dotfiles.git"
 # Identity
 user_name: "Jacob LeCoq"
 user_email: "lecoqjacob@gmail.com"
+personal_email: "lecoqjacob@gmail.com"
+bayer_email: "jacob.lecoq.ext@bayer.com"
+liatrio_email: "jacob.lecoq@liatrio.com"
 github_user: "HexSleeves"
-signing_key: "F5B8831AED0743F77428AC154B696C8ED1B35912"
+signing_key: "758709BBEB67145DE844FC85C61F052D671268B5"
 
 # XDG base dirs
 _home: "{{ lookup('env', 'HOME') }}"

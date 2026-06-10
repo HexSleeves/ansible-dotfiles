@@ -8,6 +8,7 @@ Include ~/.orbstack/ssh/config
 # =============================================================================
 
 Host *
+    IgnoreUnknown UseKeychain
     AddKeysToAgent yes
 {% if ansible_facts['os_family'] == "Darwin" %}
     UseKeychain yes
@@ -53,10 +54,12 @@ Host *
 Host github.com
     HostName github.com
     User git
+    IdentityFile ~/.ssh/id_ed25519
 
 Host gist.github.com
     HostName gist.github.com
     User git
+    IdentityFile ~/.ssh/id_ed25519
 
 Host *.bayer.com *.bayer.cnb
     IdentityFile ~/.ssh/id_bayer

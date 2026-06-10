@@ -2,7 +2,7 @@
 localhost ansible_connection=local ansible_python_interpreter=/usr/bin/python3
 
 [personal]
-localhost
+# Add personal hostnames here
 
 [work]
 # Add work hostnames here
