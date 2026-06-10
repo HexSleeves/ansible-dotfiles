@@ -10,11 +10,11 @@
     - "{{ xdg_cache_home }}"
     - "{{ xdg_state_home }}"
     - "{{ local_bin }}"
-    - "{{ _home }}/.ssh/sockets"
 
 - name: Set SSH sockets dir permissions
   ansible.builtin.file:
     path: "{{ _home }}/.ssh/sockets"
+    state: directory
     mode: "0700"
 
 - name: Set up 1Password apt repository and install packages (Debian/Ubuntu)

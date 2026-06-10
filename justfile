@@ -48,8 +48,12 @@ refresh-gpg:
 test:
     bash -n scripts/export-keys.sh
     bash -n tests/export-keys-regression.sh
+    bash -n tests/chezmoi-update-noninteractive.sh
     bash -n tests/no-deprecated-apt-repository.sh
+    bash -n tests/no-ssh-sockets-mode-flap.sh
+    bash tests/chezmoi-update-noninteractive.sh
     bash tests/no-deprecated-apt-repository.sh
+    bash tests/no-ssh-sockets-mode-flap.sh
     bash tests/export-keys-regression.sh
     ansible-playbook --syntax-check {{playbook}}
 

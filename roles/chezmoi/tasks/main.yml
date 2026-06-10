@@ -20,7 +20,7 @@
 
 - name: Update chezmoi
   ansible.builtin.command:
-    cmd: chezmoi update --no-tty
+    cmd: chezmoi update --init --force --no-tty
   when:
     - chezmoi_repo | length > 0
     - _chezmoi_src.stat.exists
