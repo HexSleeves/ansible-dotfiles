@@ -143,7 +143,7 @@ if RUBY_PLATFORM.include?("darwin")
   brew "xcodegen"
 
   # Casks
-  cask "macfuse"
+  # cask "macfuse"  # removed: SIP prevents chown on /usr/local on macOS Sequoia+
   cask "1password-cli"
   # cask "cursor"  # already installed at /Applications/Cursor.app; brew re-link fails on xattr
   # cask "codexbar"
