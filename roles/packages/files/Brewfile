@@ -114,7 +114,7 @@ brew "steipete/tap/peekaboo"
 brew "steipete/tap/remindctl"
 brew "steipete/tap/songsee"
 brew "steipete/tap/summarize"
-brew "steipete/tap/wacrawl"
+brew "steipete/tap/telecrawl"
 brew "veirt/veirt/weathr"
 brew "yakitrak/yakitrak/obsidian-cli"
 
@@ -144,7 +144,7 @@ if RUBY_PLATFORM.include?("darwin")
 
   # Casks
   cask "macfuse"
-  cask "1password-cli@beta"
+  cask "1password-cli"
   # cask "cursor"  # already installed at /Applications/Cursor.app; brew re-link fails on xattr
   # cask "codexbar"
   cask "dotnet-sdk"
