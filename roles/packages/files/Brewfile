@@ -7,7 +7,7 @@
 # ── Taps ─────────────────────────────────────────────────────
 tap "antoniorodr/memo"
 tap "boldsoftware/tap"
-tap "gromgit/fuse"
+# tap "gromgit/fuse"  # removed: sshfs-mac deprecated
 tap "hashicorp/tap"
 tap "openhue/cli"
 tap "starkandwayne/cf"
@@ -82,7 +82,7 @@ brew "shfmt"
 brew "socat"
 brew "starship"
 brew "stylua"
-brew "tailscale"
+# brew "tailscale", link: false  # managed by standalone Tailscale app (wrapper at /opt/homebrew/bin/tailscale)
 brew "tealdeer"
 brew "hashicorp/tap/terraform", link: false
 brew "tfenv"
@@ -100,7 +100,7 @@ brew "zsh"
 
 # ── Tapped formulas ──────────────────────────────────────────
 brew "antoniorodr/memo/memo"
-brew "gromgit/fuse/sshfs-mac"
+# brew "gromgit/fuse/sshfs-mac"  # deprecated: disabled 2026-02-11, requires macFUSE
 brew "hashicorp/tap/vault"
 brew "openhue/cli/openhue-cli"
 brew "starkandwayne/cf/safe"
@@ -143,9 +143,10 @@ if RUBY_PLATFORM.include?("darwin")
   brew "xcodegen"
 
   # Casks
-  cask "1password-cli"
+  cask "macfuse"
+  cask "1password-cli@beta"
   # cask "cursor"  # already installed at /Applications/Cursor.app; brew re-link fails on xattr
-  cask "codexbar"
+  # cask "codexbar"
   cask "dotnet-sdk"
   cask "font-caskaydia-cove-nerd-font"
   cask "font-fira-code"
@@ -163,5 +164,4 @@ if RUBY_PLATFORM.include?("darwin")
   # Tapped casks
   cask "boldsoftware/tap/shelley"
   cask "boldsoftware/tap/sketch"
-  cask "steipete/tap/codexbar"
 end

@@ -4,6 +4,7 @@ common_debian_packages:
   - curl
   - build-essential
   - gnupg
+  - python3-debian
   - age
   - wl-clipboard
 

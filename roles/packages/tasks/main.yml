@@ -45,6 +45,17 @@
   when: ansible_facts['os_family'] != "Darwin"
   tags: [packages, bootstrap]
 
+- name: Migrate from 1password-cli@beta to 1password-cli
+  ansible.builtin.command:
+    cmd: brew uninstall --cask 1password-cli@beta
+  register: packages_1password_uninstall
+  changed_when: "'Successfully uninstalled' in packages_1password_uninstall.stderr"
+  failed_when: false
+  when: ansible_facts['os_family'] == "Darwin"
+  environment:
+    PATH: "/home/linuxbrew/.linuxbrew/bin:/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
+  tags: [packages]
+
 - name: Run brew bundle
   ansible.builtin.command:
     cmd: brew bundle --file={{ role_path }}/files/Brewfile

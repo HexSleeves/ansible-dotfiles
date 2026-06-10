@@ -8,12 +8,12 @@ Cross-platform machine provisioning for macOS and Linux (Debian/Ubuntu, Arch, RH
 
 ## Requirements
 
-| Dependency | Purpose |
-|---|---|
-| Ansible ≥ 2.15 | Provisioning engine |
-| Python 3 | Ansible runtime |
+| Dependency           | Purpose                  |
+| -------------------- | ------------------------ |
+| Ansible ≥ 2.15       | Provisioning engine      |
+| Python 3             | Ansible runtime          |
 | 1Password CLI (`op`) | Vault password retrieval |
-| Git | Repo clone, chezmoi |
+| Git                  | Repo clone, chezmoi      |
 
 ---
 
@@ -26,6 +26,7 @@ curl -fsSL https://raw.githubusercontent.com/HexSleeves/ansible-dotfiles/main/sc
 ```
 
 This script:
+
 1. Installs `git` if missing
 2. Clones this repo to `~/Developer/ansible-dotfiles`
 3. Installs Ansible via `pipx` and symlinks all `ansible-*` binaries to `~/.local/bin`
@@ -54,6 +55,24 @@ ansible-playbook site.yml --diff
 ansible-playbook playbooks/packages.yml
 ansible-playbook playbooks/secrets.yml
 ansible-playbook playbooks/dotfiles.yml
+```
+
+### Local task runner
+
+This repo includes a `justfile` for common commands:
+
+```bash
+just                 # list recipes
+just syntax          # ansible-playbook --syntax-check site.yml
+just check           # dry run with --check --diff
+just apply           # full site.yml run with --diff
+just tags secrets    # run site.yml with --tags secrets
+just check-tags ssh,gpg,secrets
+just packages
+just secrets
+just dotfiles
+just refresh-gpg     # refresh vault_gpg_keyring_b64 from local GPG keyring
+just verify          # shell checks, deprecation guards, export regression, syntax check, diff check
 ```
 
 ---
@@ -95,17 +114,18 @@ ansible-dotfiles/
 ```
 
 ---
+
 ## Roles
 
 ### `common`
 
 Creates XDG base directories and `~/.ssh/sockets`. On Debian/Ubuntu, repairs 1Password's apt repository metadata. Installs minimal native packages required before Homebrew:
 
-| Platform | Packages |
-|---|---|
-| Debian/Ubuntu | `git curl build-essential gnupg age wl-clipboard` |
-| Arch | `git curl base-devel gnupg age` |
-| RHEL/Fedora | `git curl gcc gcc-c++ make gnupg2` |
+| Platform      | Packages                                          |
+| ------------- | ------------------------------------------------- |
+| Debian/Ubuntu | `git curl build-essential gnupg python3-debian age wl-clipboard` |
+| Arch          | `git curl base-devel gnupg age`                   |
+| RHEL/Fedora   | `git curl gcc gcc-c++ make gnupg2`                |
 
 ---
 
@@ -137,10 +157,10 @@ Additional platform-specific packages:
 
 Installs [mise](https://mise.jdx.dev) and activates language runtimes globally:
 
-| Tools | Machine class |
-|---|---|
-| `node@lts` `python@latest` `golang@latest` `deno@latest` `bun@latest` | All |
-| `rust@latest` `lua@latest` `neovim@latest` `yamlfmt@latest` | Personal only |
+| Tools                                                                 | Machine class |
+| --------------------------------------------------------------------- | ------------- |
+| `node@lts` `python@latest` `golang@latest` `deno@latest` `bun@latest` | All           |
+| `rust@latest` `lua@latest` `neovim@latest` `yamlfmt@latest`           | Personal only |
 
 Personal machines also install via `cargo binstall`: `bat ripgrep fd-find eza zoxide starship bottom tokei`
 
@@ -197,6 +217,7 @@ Creates `~/.ssh` (mode `0700`) and `~/.ssh/sockets`. Templates `~/.ssh/config` w
 - Host stanzas for `github.com`, `gist.github.com`, `*.bayer.com`, `localhost`, personal servers
 
 Deploys private keys from vault (mode `0600`):
+
 - `vault_ssh_key_ed25519` → `~/.ssh/id_ed25519`
 - `vault_ssh_key_bayer` → `~/.ssh/id_bayer`
 
@@ -214,14 +235,14 @@ Imports the full GPG keyring from vault. Skips if the signing key fingerprint (`
 
 Deploys encrypted application configs (all mode `0600`, `no_log: true`):
 
-| Vault variable | Destination |
-|---|---|
-| `vault_claude_settings` | `~/.claude/settings.json` |
-| `vault_claude_config` | `~/.claude.json` |
-| `vault_codex_config` | `~/.codex/config.toml` |
-| `vault_cursor_mcp` | `~/.cursor/mcp.json` |
-| `vault_npm_token` | `~/.config/npm/npmrc` |
-| `vault_raycast_config` | `~/.config/raycast/config.json` |
+| Vault variable          | Destination                         |
+| ----------------------- | ----------------------------------- |
+| `vault_claude_settings` | `~/.claude/settings.json`           |
+| `vault_claude_config`   | `~/.claude.json`                    |
+| `vault_codex_config`    | `~/.codex/config.toml`              |
+| `vault_cursor_mcp`      | `~/.cursor/mcp.json`                |
+| `vault_npm_token`       | `~/.config/npm/npmrc`               |
+| `vault_raycast_config`  | `~/.config/raycast/config.json`     |
 | `vault_opencode_config` | `~/.config/opencode/opencode.jsonc` |
 
 Also copies static (non-secret) config files from `roles/secrets/files/` for Claude, Codex, and Cursor (agent docs, commands, skills, hooks).
@@ -232,10 +253,10 @@ Also copies static (non-secret) config files from `roles/secrets/files/` for Cla
 
 Clones dotfile-adjacent repos (no auto-update by default — pass `-e external_repos_update=true` to pull):
 
-| Repo | Destination |
-|---|---|
-| `HexSleeves/nvim` | `~/.config/nvim` |
-| `HexSleeves/zdotdir` | `~/.config/zsh` |
+| Repo                 | Destination      |
+| -------------------- | ---------------- |
+| `HexSleeves/nvim`    | `~/.config/nvim` |
+| `HexSleeves/zdotdir` | `~/.config/zsh`  |
 
 On Linux x86_64: downloads and SHA256-verifies the `glow` v2.1.2 binary to `~/.local/bin/glow`.
 
@@ -270,17 +291,17 @@ sudo tailscale up
 
 Run any subset with `--tags`:
 
-| Tag | Roles |
-|---|---|
-| `bootstrap` | `common` + `packages` |
-| `dotfiles` | `chezmoi` + `secrets` |
-| `packages` | `packages` + `mise` |
-| `secrets` | `ssh` + `gpg` + `secrets` |
-| `chezmoi` | `chezmoi` |
-| `macos` | `macos` |
-| `network` | `tailscale` |
-| `external` | `external` |
-| Role name | That role only (e.g. `--tags mise`) |
+| Tag         | Roles                               |
+| ----------- | ----------------------------------- |
+| `bootstrap` | `common` + `packages`               |
+| `dotfiles`  | `chezmoi` + `secrets`               |
+| `packages`  | `packages` + `mise`                 |
+| `secrets`   | `ssh` + `gpg` + `secrets`           |
+| `chezmoi`   | `chezmoi`                           |
+| `macos`     | `macos`                             |
+| `network`   | `tailscale`                         |
+| `external`  | `external`                          |
+| Role name   | That role only (e.g. `--tags mise`) |
 
 Examples:
 
@@ -312,10 +333,13 @@ Jacobs-MacBook-Pro.local
 work-laptop.local
 ```
 
-| Class | Extra installs |
-|---|---|
+| Class      | Extra installs                                              |
+| ---------- | ----------------------------------------------------------- |
 | `Personal` | Rust, Lua, Neovim, yamlfmt (mise), cargo tools, npm globals |
-| `Work` | Core mise runtimes only |
+| `Work`     | Core mise runtimes only                                     |
+| ---        | ---                                                         |
+| `Personal` | Rust, Lua, Neovim, yamlfmt (mise), cargo tools, npm globals |
+| `Work`     | Core mise runtimes only                                     |
 
 ---
 
@@ -377,11 +401,14 @@ gpg --export-ownertrust >> /tmp/ownertrust.txt
 ## Adding a New Secret Config
 
 1. Encrypt the file content:
+
    ```bash
    ansible-vault encrypt_string "$(cat ~/.config/mytool/config.json)" --name 'vault_mytool_config'
    ```
+
 2. Add the variable to `inventory/group_vars/all/vault.yml`
 3. Add a deploy task to `roles/secrets/tasks/main.yml`:
+
    ```yaml
    - name: Deploy mytool config
      ansible.builtin.copy:

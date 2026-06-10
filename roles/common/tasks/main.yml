@@ -22,10 +22,11 @@
   when: ansible_facts['os_family'] == "Debian"
   tags: [packages, bootstrap]
   block:
-    - name: Check 1Password deb822 source
-      ansible.builtin.stat:
-        path: /etc/apt/sources.list.d/1password.sources
-      register: common_1password_sources
+    - name: Install deb822 repository support
+      ansible.builtin.apt:
+        name: python3-debian
+        state: present
+        update_cache: true
 
     - name: Check legacy 1Password apt source
       ansible.builtin.stat:
@@ -44,8 +45,6 @@
         mode: "0644"
       when: >-
         not common_1password_keyring.stat.exists
-        or common_1password_sources.stat.exists
-        or common_1password_list.stat.exists
       register: common_1password_key_download
 
     - name: Install 1Password apt signing key
@@ -63,22 +62,27 @@
         state: absent
       when: common_1password_key_download is not skipped
 
-    - name: Remove duplicate legacy 1Password apt source
+    - name: Remove legacy 1Password apt source
       ansible.builtin.file:
         path: /etc/apt/sources.list.d/1password.list
         state: absent
-      when:
-        - common_1password_sources.stat.exists
-        - common_1password_list.stat.exists
+      when: common_1password_list.stat.exists
 
     - name: Add 1Password apt repository
-      ansible.builtin.apt_repository:
-        repo: >-
-          deb [arch=amd64 signed-by=/usr/share/keyrings/1password-archive-keyring.gpg]
-          https://downloads.1password.com/linux/debian/amd64 stable main
-        filename: 1password
+      ansible.builtin.deb822_repository:
+        name: 1password
+        types:
+          - deb
+        uris:
+          - https://downloads.1password.com/linux/debian/amd64
+        suites:
+          - stable
+        components:
+          - main
+        architectures:
+          - amd64
+        signed_by: /usr/share/keyrings/1password-archive-keyring.gpg
         state: present
-      when: not common_1password_sources.stat.exists
 
     - name: Install 1Password desktop app and CLI via apt
       ansible.builtin.apt:
