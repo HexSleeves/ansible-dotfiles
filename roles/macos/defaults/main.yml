@@ -30,8 +30,8 @@ macos_defaults:
   - { domain: NSGlobalDomain, key: NSAutomaticSpellingCorrectionEnabled, type: bool, value: false }
 
   # Fast key repeat
-  - { domain: NSGlobalDomain, key: KeyRepeat, type: float, value: 2.0 }
-  - { domain: NSGlobalDomain, key: InitialKeyRepeat, type: float, value: 15.0 }
+  - { domain: NSGlobalDomain, key: KeyRepeat, type: int, value: 2 }
+  - { domain: NSGlobalDomain, key: InitialKeyRepeat, type: int, value: 15 }
 
   # Trackpad: enable tap to click (stored as int, not bool)
   - { domain: com.apple.driver.AppleBluetoothMultitouch.trackpad, key: Clicking, type: int, value: 1 }
@@ -68,7 +68,7 @@ macos_defaults:
   - { domain: com.apple.dock, key: show-recents, type: bool, value: false }
 
   # Dock: reduce dock size
-  - { domain: com.apple.dock, key: tilesize, type: int, value: 48 }
+  - { domain: com.apple.dock, key: tilesize, type: float, value: 48.0 }
 
   # Screenshots: save to ~/Desktop/Screenshots
   - { domain: com.apple.screencapture, key: location, type: string, value: "~/Desktop/Screenshots" }
