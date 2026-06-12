@@ -9,6 +9,33 @@
     create: true
     mode: "0644"
   become: true
+  when: macos_touchid_sudo | default(true) | bool
+
+- name: Disable TouchID for sudo
+  ansible.builtin.lineinfile:
+    path: /etc/pam.d/sudo_local
+    regexp: '^auth\s+sufficient\s+pam_tid\.so'
+    line: "# auth       sufficient     pam_tid.so"
+    mode: "0644"
+  become: true
+  when: not (macos_touchid_sudo | default(true) | bool)
+
+- name: Configure passwordless sudo
+  ansible.builtin.lineinfile:
+    path: "/etc/sudoers.d/{{ ansible_facts['env']['USER'] }}-nopasswd"
+    line: "{{ ansible_facts['env']['USER'] }} ALL=(ALL) NOPASSWD: ALL"
+    create: true
+    mode: "0440"
+    validate: "visudo -cf %s"
+  become: true
+  when: macos_nopasswd_sudo | default(false) | bool
+
+- name: Remove passwordless sudo
+  ansible.builtin.file:
+    path: "/etc/sudoers.d/{{ ansible_facts['env']['USER'] }}-nopasswd"
+    state: absent
+  become: true
+  when: not (macos_nopasswd_sudo | default(false) | bool)
 
 - name: Check Spotlight indexing status for ~/Developer
   ansible.builtin.command:

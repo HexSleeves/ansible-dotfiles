@@ -268,12 +268,20 @@ On Linux: downloads Monaspace fonts v1.400 to `~/.local/share/fonts/Monaspace/` 
 
 Darwin only. Applies system-level macOS configuration:
 
-- Enables **TouchID for sudo** (`/etc/pam.d/sudo_local`)
+- **TouchID for sudo** — configurable via `macos_touchid_sudo` (default: `true`)
+- **Passwordless sudo** — configurable via `macos_nopasswd_sudo` (default: `false`)
 - Disables **Spotlight indexing** of `~/Developer`
 - Adds `sshd` to the macOS application firewall
 - Applies `macos_defaults` list via `community.general.osx_defaults`
 
 Notable defaults managed: boot sound off, save to disk not iCloud, fast key repeat, tap-to-click, Finder hidden files/extensions/status bar/path bar, Dock autohide and tile size, screenshot format and location, Activity Monitor settings.
+
+**Sudo configuration variables** (set in `inventory/group_vars/all/vars.yml`):
+
+| Variable | Default | Effect |
+|----------|---------|--------|
+| `macos_touchid_sudo` | `true` | Enables TouchID prompt in `sudo_local` |
+| `macos_nopasswd_sudo` | `false` | Creates `/etc/sudoers.d/{user}-nopasswd` for passwordless sudo |
 
 ---
 
