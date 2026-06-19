@@ -24,7 +24,7 @@ machine_class: "Personal"
 
 # macOS sudo configuration
 macos_touchid_sudo: false
-macos_nopasswd_sudo: false
+macos_nopasswd_sudo: true
 
 # Language versions
 python_version: "3.14"
