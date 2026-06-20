@@ -9,25 +9,26 @@ tap "antoniorodr/memo"
 tap "boldsoftware/tap"
 # tap "gromgit/fuse"  # removed: sshfs-mac deprecated
 tap "hashicorp/tap"
-tap "openhue/cli"
-tap "starkandwayne/cf"
+# tap "openhue/cli"  # removed: only needed for Hue lights
+# tap "starkandwayne/cf"  # redirected to cloudfoundry-community/cf
+tap "cloudfoundry-community/cf"
 tap "steipete/tap"
-tap "veirt/veirt"
+# tap "veirt/veirt"  # removed: only provided weathr (novelty)
 tap "yakitrak/yakitrak"
 
 # ── Cross-platform CLI tools ─────────────────────────────────
 brew "act"
 brew "age"
-brew "arp-scan"
+# brew "arp-scan"  # removed: rarely needed network scanner
 brew "ast-grep"
 brew "atuin"
 brew "awscli"
 brew "bandwhich"
 brew "bat"
-brew "bitwarden-cli"
+# brew "bitwarden-cli"  # removed: using 1Password
 brew "bottom"
 brew "broot"
-brew "btop"
+# brew "btop"  # removed: duplicate of bottom
 brew "chezmoi"
 brew "clang-format"
 brew "cmake"
@@ -39,19 +40,19 @@ brew "dust"
 brew "eza"
 brew "fd"
 brew "ffmpeg"
-brew "fish"
+# brew "fish"  # removed: shell config is zsh-only
 brew "fzf"
-brew "gcc"
+# brew "gcc"
 brew "ggshield"
 brew "gh"
 brew "git-cliff"
 brew "git-delta"
 brew "glow"
 brew "gnupg"
-brew "gnuplot"
-brew "gping"
+# brew "gnuplot"  # removed: scientific plotting, niche
+# brew "gping"  # removed: cosmetic ping graph
 brew "gum"
-brew "hexyl"
+# brew "hexyl"  # removed: niche hex viewer
 brew "himalaya"
 brew "htop"
 brew "hyperfine"
@@ -63,19 +64,19 @@ brew "kubernetes-cli"
 brew "lazydocker"
 brew "lazygit"
 brew "markdownlint-cli"
-brew "mise"
+# brew "mise"
 brew "mkcert"
 brew "mosh"
 brew "neovim"
-brew "ollama"
+# brew "ollama"  # removed: large local LLM runtime
 brew "openssl@3"
-brew "pass"
-brew "pinentry"
+# brew "pass"  # removed: 1Password handles secrets
+# brew "pinentry"  # removed: redundant with pinentry-mac on macOS
 brew "pipx"
 brew "pkgconf"
 brew "pnpm"
 brew "ripgrep"
-brew "ripsecrets"
+# brew "ripsecrets"  # removed: duplicate of ggshield
 brew "sd"
 brew "shellcheck"
 brew "shfmt"
@@ -91,10 +92,10 @@ brew "tokei"
 brew "topgrade"
 brew "tree"
 brew "watchexec"
-brew "wget"
+# brew "wget"  # removed: curl already installed
 brew "xh"
 brew "yq"
-brew "zellij"
+# brew "zellij"  # removed: duplicate of tmux
 brew "zoxide"
 brew "zsh"
 
@@ -102,20 +103,21 @@ brew "zsh"
 brew "antoniorodr/memo/memo"
 # brew "gromgit/fuse/sshfs-mac"  # deprecated: disabled 2026-02-11, requires macFUSE
 brew "hashicorp/tap/vault"
-brew "openhue/cli/openhue-cli"
-brew "starkandwayne/cf/safe"
-brew "steipete/tap/birdclaw"
-brew "steipete/tap/gifgrep"
+# brew "openhue/cli/openhue-cli"  # removed: only needed for Hue lights
+# brew "starkandwayne/cf/safe"  # redirected to cloudfoundry-community/cf
+brew "cloudfoundry-community/cf/safe"
+# brew "steipete/tap/birdclaw"  # removed: Twitter/X client, niche
+# brew "steipete/tap/gifgrep"  # removed: GIF search, novelty
 # brew "steipete/tap/goplaces"  # removed from steipete/tap
 # brew "steipete/tap/gogcli"  # removed from steipete/tap
 brew "steipete/tap/imsg"
-brew "steipete/tap/ordercli", link: false
+# brew "steipete/tap/ordercli"  # removed: very specific use case
 brew "steipete/tap/peekaboo"
 brew "steipete/tap/remindctl"
-brew "steipete/tap/songsee"
+# brew "steipete/tap/songsee"  # removed: cosmetic now-playing
 brew "steipete/tap/summarize"
-brew "steipete/tap/telecrawl"
-brew "veirt/veirt/weathr"
+# brew "steipete/tap/telecrawl"  # removed: Telegram crawler, niche
+# brew "veirt/veirt/weathr"  # removed: weather, novelty
 brew "yakitrak/yakitrak/obsidian-cli"
 
 # ── Linux-only ────────────────────────────────────────────────
@@ -134,10 +136,10 @@ end
 
 # ── macOS-only ────────────────────────────────────────────────
 if RUBY_PLATFORM.include?("darwin")
-  brew "cocoapods"
-  brew "docker"
+  # brew "cocoapods"
+  # brew "docker"  # removed: heavy; use orbstack or colima instead
   brew "libimobiledevice"
-  brew "llvm"
+  # brew "llvm"  # removed: ~22 minute source build, ~2 GB
   brew "pinentry-mac"
   brew "swift-format"
   brew "xcodegen"
@@ -147,15 +149,15 @@ if RUBY_PLATFORM.include?("darwin")
   cask "1password-cli"
   # cask "cursor"  # already installed at /Applications/Cursor.app; brew re-link fails on xattr
   # cask "codexbar"
-  cask "dotnet-sdk"
+  # cask "dotnet-sdk"  # removed: ~1 GB, requires sudo for pkg install
   cask "font-caskaydia-cove-nerd-font"
-  cask "font-fira-code"
+  # cask "font-fira-code"  # removed: font-fira-code-nerd-font includes all glyphs + icons
   cask "font-fira-code-nerd-font"
   cask "font-jetbrains-mono-nerd-font"
   cask "gcloud-cli"
-  cask "git-credential-manager"
+  # cask "git-credential-manager"  # removed: 1Password handles git creds, also requires sudo
   cask "iterm2"
-  cask "orbstack"
+  # cask "orbstack"  # removed: pick one container runtime
   cask "pgadmin4"
   cask "raycast"
   cask "rectangle"

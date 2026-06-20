@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bootstrap: install Ansible and run site.yml
+# Bootstrap: install Homebrew (macOS), Ansible, and run site.yml
 # Usage: bash scripts/bootstrap.sh [ansible-playbook args]
 set -euo pipefail
 
@@ -7,6 +7,43 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_DIR"
 
 log() { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*"; }
+
+install_brew() {
+    if command -v brew >/dev/null 2>&1; then
+        log "Homebrew already installed at $(brew --prefix)."
+        return
+    fi
+    if [[ "$(uname -s)" != "Darwin" ]]; then
+        return
+    fi
+
+    local arch
+    arch="$(uname -m)"
+    log "Installing Homebrew on ${arch} macOS..."
+
+    # Standard install detects arm64 → /opt/homebrew, x86_64 → /usr/local.
+    # On macOS 14+ it may need sudo for /opt/homebrew; run with NONINTERACTIVE.
+    if NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; then
+        log "Homebrew installed via standard installer."
+    else
+        log "Standard install failed (likely needs sudo)."
+        log "Run the installer manually, then re-run bootstrap:"
+        log '  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+        exit 1
+    fi
+
+    local brew_prefix
+    if [[ "$arch" == "arm64" ]]; then
+        brew_prefix="/opt/homebrew"
+    else
+        brew_prefix="/usr/local"
+    fi
+
+    eval "$("$brew_prefix/bin/brew" shellenv)"
+    mkdir -p "$HOME/.local/bin"
+    ln -sf "$brew_prefix/bin/brew" "$HOME/.local/bin/brew"
+    log "Homebrew installed at $brew_prefix."
+}
 
 install_ansible() {
     log "Installing Ansible via pipx..."
@@ -49,9 +86,17 @@ verify_1password() {
     fi
 }
 
+install_brew
 install_ansible
 install_collections
-verify_1password
+
+# Warn if vault password is unreachable — suggest bootstrapping without secrets first.
+if ! bash .vault-password-op.sh >/dev/null 2>&1; then
+    log "WARNING: Vault password is not available."
+    log "  Start with: ansible-playbook site.yml --diff --tags bootstrap"
+    log "  Or install 1Password CLI: brew install --cask 1password-cli && op signin"
+    log "  Or create .vault-pass with the plaintext password."
+fi
 
 log "Running site.yml..."
 ansible-playbook site.yml --diff "$@"

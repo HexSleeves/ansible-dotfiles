@@ -12,6 +12,31 @@
       changed_when: false
       when: install_ansible_collections | default(false) | bool
 
+    - name: Check vault password is reachable
+      ansible.builtin.command:
+        cmd: "{{ playbook_dir }}/.vault-password-op.sh"
+      delegate_to: localhost
+      run_once: true
+      changed_when: false
+      register: _vault_check
+      failed_when: false
+
+    - name: Warn if vault password is unreachable
+      ansible.builtin.debug:
+        msg: >-
+          Vault password is not available — roles tagged 'secrets'
+          (ssh, gpg, secrets) will fail. Bootstrap first with
+          --tags bootstrap to install 1Password CLI and Homebrew,
+          then re-run the full playbook.
+      when:
+        - _vault_check.rc | default(0) != 0
+
+    - name: Detect macOS architecture for brew prefix
+      ansible.builtin.set_fact:
+        macos_arch: "{{ ansible_facts['architecture'] }}"
+        brew_prefix: "{{ '/opt/homebrew' if ansible_facts['architecture'] == 'arm64' else '/usr/local' }}"
+      when: ansible_facts['os_family'] == "Darwin"
+
   roles:
     - role: common
       tags: [common, bootstrap]
@@ -47,3 +72,21 @@
 
     - role: tailscale
       tags: [tailscale, network]
+
+  post_tasks:
+    # Re-render chezmoi config if template changed (e.g. after git update or
+    # newly-applied dotfiles changed the template). This avoids the
+    # "config file template has changed" warning on subsequent runs.
+    - name: Re-render chezmoi config if needed
+      ansible.builtin.shell:
+        cmd: |
+          if chezmoi init --no-tty 2>/dev/null; then
+            echo "chezmoi config re-rendered"
+          else
+            echo "chezmoi init skipped (not yet initialized)"
+          fi
+      args:
+        executable: /bin/bash
+      changed_when: false
+      failed_when: false
+      tags: [chezmoi, dotfiles]

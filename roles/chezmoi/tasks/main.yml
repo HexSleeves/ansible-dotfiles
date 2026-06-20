@@ -1,4 +1,26 @@
 ---
+- name: Install chezmoi (macOS - prefer brew)
+  community.general.homebrew:
+    name: chezmoi
+    state: present
+  when: ansible_facts['os_family'] == "Darwin"
+
+- name: Check if chezmoi binary exists (macOS fallback)
+  ansible.builtin.command:
+    cmd: which chezmoi
+  register: _chezmoi_bin
+  changed_when: false
+  failed_when: false
+  when: ansible_facts['os_family'] == "Darwin"
+
+- name: Install chezmoi via get.chezmoi.io (macOS fallback)
+  ansible.builtin.shell:
+    cmd: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "{{ local_bin }}"
+    creates: "{{ local_bin }}/chezmoi"
+  when:
+    - ansible_facts['os_family'] == "Darwin"
+    - _chezmoi_bin.rc | default(1) != 0
+
 - name: Install chezmoi (Linux)
   ansible.builtin.shell:
     cmd: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "{{ local_bin }}"
@@ -10,12 +32,27 @@
     path: "{{ xdg_data_home }}/chezmoi"
   register: _chezmoi_src
 
-- name: Initialize and apply chezmoi
+- name: Check if chezmoi config template has changed
+  ansible.builtin.stat:
+    path: "{{ xdg_data_home }}/chezmoi/home/.chezmoi.toml.tmpl"
+  register: _chezmoi_tmpl
+  when: _chezmoi_src.stat.exists
+
+- name: Initialize chezmoi from repo
   ansible.builtin.command:
     cmd: chezmoi init --apply "{{ chezmoi_repo }}"
   when:
     - chezmoi_repo | length > 0
     - not _chezmoi_src.stat.exists
+  changed_when: true
+
+- name: Re-render chezmoi config if template changed
+  ansible.builtin.command:
+    cmd: chezmoi init --no-tty
+  when:
+    - _chezmoi_src.stat.exists
+    - _chezmoi_tmpl.stat is defined
+    - _chezmoi_tmpl.stat.mtime is defined
   changed_when: true
 
 - name: Update chezmoi

@@ -1,6 +1,8 @@
 ---
 collections:
+  # community.general 9.x supports ansible-core 2.15–2.18.
+  # Version 10+ drops 2.15 support — pin here when upgrading ansible.
   - name: community.general
-    version: ">=9.0.0"
+    version: ">=9.0.0,<10.0.0"
   - name: ansible.posix
     version: ">=1.5.0"

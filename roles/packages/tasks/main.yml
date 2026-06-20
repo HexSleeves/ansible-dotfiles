@@ -26,14 +26,75 @@
   when: ansible_facts['os_family'] == "RedHat"
   tags: [packages, bootstrap]
 
+# Locate Homebrew — supports /opt/homebrew, /usr/local, and ~/.homebrew.
+- name: Find brew binary
+  ansible.builtin.shell:
+    cmd: |
+      for candidate in /opt/homebrew/bin/brew /usr/local/bin/brew "$HOME/.homebrew/bin/brew"; do
+        [ -x "$candidate" ] && echo "$candidate" && exit 0
+      done
+      command -v brew 2>/dev/null || true
+  register: _brew_bin
+  changed_when: false
+  tags: [packages, bootstrap, always]
+
+- name: Set brew prefix fact
+  ansible.builtin.set_fact:
+    brew_bin: "{{ _brew_bin.stdout_lines[0] if _brew_bin.stdout_lines | length > 0 else 'brew' }}"
+    brew_prefix: "{{ (_brew_bin.stdout_lines[0] | dirname | dirname) if _brew_bin.stdout_lines | length > 0 else '' }}"
+  tags: [packages, bootstrap, always]
+
 # Homebrew: primary package manager on both macOS and Linux
 - name: Install Homebrew (macOS)
   ansible.builtin.shell:
     cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     creates: /opt/homebrew/bin/brew
+  register: _brew_macos_install
+  when:
+    - ansible_facts['os_family'] == "Darwin"
+    - brew_prefix == ''
+  failed_when: false
+  changed_when: _brew_macos_install.rc == 0
   environment:
     NONINTERACTIVE: "1"
-  when: ansible_facts['os_family'] == "Darwin"
+  tags: [packages, bootstrap]
+
+- name: Set brew facts after standard macOS install
+  ansible.builtin.set_fact:
+    brew_bin: /opt/homebrew/bin/brew
+    brew_prefix: /opt/homebrew
+  when:
+    - _brew_macos_install is not skipped
+    - _brew_macos_install.rc | default(1) == 0
+  tags: [packages, bootstrap]
+
+- name: Install Homebrew to user prefix (macOS fallback)
+  block:
+    - name: Create user brew prefix
+      ansible.builtin.file:
+        path: "{{ _home }}/.homebrew"
+        state: directory
+        mode: "0755"
+    - name: Extract Homebrew tarball
+      ansible.builtin.unarchive:
+        src: https://github.com/Homebrew/brew/tarball/master
+        dest: "{{ _home }}/.homebrew"
+        extra_opts: [--strip-components=1]
+        remote_src: true
+        creates: "{{ _home }}/.homebrew/bin/brew"
+    - name: Symlink brew to local bin
+      ansible.builtin.file:
+        src: "{{ _home }}/.homebrew/bin/brew"
+        dest: "{{ local_bin }}/brew"
+        state: link
+    - name: Update brew fact
+      ansible.builtin.set_fact:
+        brew_bin: "{{ _home }}/.homebrew/bin/brew"
+        brew_prefix: "{{ _home }}/.homebrew"
+  when:
+    - ansible_facts['os_family'] == "Darwin"
+    - brew_prefix == ''
+    - _brew_macos_install.rc | default(1) != 0
   tags: [packages, bootstrap]
 
 - name: Install Homebrew (Linux)
@@ -42,23 +103,35 @@
     creates: /home/linuxbrew/.linuxbrew/bin/brew
   environment:
     NONINTERACTIVE: "1"
-  when: ansible_facts['os_family'] != "Darwin"
+  when:
+    - ansible_facts['os_family'] != "Darwin"
+    - brew_prefix == ''
   tags: [packages, bootstrap]
+
+- name: Trust third-party taps
+  ansible.builtin.command:
+    cmd: "{{ brew_bin }} trust --tap {{ item }}"
+  loop: "{{ packages_brew_taps }}"
+  changed_when: false
+  failed_when: false
+  environment:
+    PATH: "{{ brew_prefix }}/bin:{{ ansible_facts['env']['PATH'] }}"
+  tags: [packages]
 
 - name: Migrate from 1password-cli@beta to 1password-cli
   ansible.builtin.command:
-    cmd: brew uninstall --cask 1password-cli@beta
+    cmd: "{{ brew_bin }} uninstall --cask 1password-cli@beta"
   register: packages_1password_uninstall
   changed_when: "'Successfully uninstalled' in packages_1password_uninstall.stderr"
   failed_when: false
   when: ansible_facts['os_family'] == "Darwin"
   environment:
-    PATH: "/home/linuxbrew/.linuxbrew/bin:/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
+    PATH: "{{ brew_prefix }}/bin:{{ ansible_facts['env']['PATH'] }}"
   tags: [packages]
 
 - name: Run brew bundle
   ansible.builtin.command:
-    cmd: brew bundle --file={{ role_path }}/files/Brewfile
+    cmd: "{{ brew_bin }} bundle install --file={{ role_path }}/files/Brewfile --jobs=1"
   register: packages_brew_bundle
   changed_when: >-
     'Installing' in packages_brew_bundle.stdout
@@ -66,5 +139,6 @@
     or 'Installing' in packages_brew_bundle.stderr
     or 'Upgrading' in packages_brew_bundle.stderr
   environment:
-    PATH: "/home/linuxbrew/.linuxbrew/bin:/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
+    PATH: "{{ brew_prefix }}/bin:{{ ansible_facts['env']['PATH'] }}"
+    HOMEBREW_PREFIX: "{{ brew_prefix }}"
   tags: [packages]

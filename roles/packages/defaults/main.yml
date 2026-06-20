@@ -1,5 +1,12 @@
 ---
-# Everything else is installed via brew bundle.
+# Taps that need explicit trust before formulas can be installed from them.
+packages_brew_taps:
+  - antoniorodr/memo
+  - boldsoftware/tap
+  - cloudfoundry-community/cf
+  - hashicorp/tap
+  - steipete/tap
+  - yakitrak/yakitrak
 
 packages_apt_bootstrap_packages:
   - build-essential

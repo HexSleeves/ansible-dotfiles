@@ -97,4 +97,4 @@
       ansible.builtin.file:
         path: "{{ gpg_import_tmp.path }}"
         state: absent
-      when: gpg_import_tmp.path is defined
+      when: gpg_import_tmp is defined
