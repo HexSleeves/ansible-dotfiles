@@ -45,7 +45,7 @@ mise_core_tools:
 
 # Mise runtimes (personal only)
 mise_personal_tools:
-  - name: rust
+  - name: cargo-binstall
     version: latest
   - name: lua
     version: latest

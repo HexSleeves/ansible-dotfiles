@@ -34,15 +34,9 @@
   register: mise_personal_install
   changed_when: "'installed' in mise_personal_install.stdout | lower"
 
-- name: Install cargo-binstall
-  ansible.builtin.command:
-    cmd: "{{ local_bin }}/mise exec rust -- cargo install cargo-binstall"
-    creates: "{{ _home }}/.cargo/bin/cargo-binstall"
-  when: machine_class | default('Personal') == "Personal"
-
 - name: Install cargo tools via cargo-binstall
   ansible.builtin.command:
-    cmd: "{{ _home }}/.cargo/bin/cargo binstall --no-confirm --quiet {{ item }}"
+    cmd: "{{ local_bin }}/mise exec cargo-binstall -- cargo-binstall --no-confirm --quiet {{ item }}"
   loop: "{{ cargo_tools }}"
   when: machine_class | default('Personal') == "Personal"
   register: mise_cargo_install
