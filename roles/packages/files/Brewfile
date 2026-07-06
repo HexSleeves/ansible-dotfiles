@@ -159,9 +159,9 @@ if RUBY_PLATFORM.include?("darwin")
   cask "iterm2"
   # cask "orbstack"  # removed: pick one container runtime
   cask "pgadmin4"
-  cask "raycast"
+  # cask "raycast"  # replaced by Raycast Beta (installed manually via external role)
   cask "rectangle"
-  cask "zed"
+  cask "zed@preview"
 
   # Tapped casks
   cask "boldsoftware/tap/shelley"

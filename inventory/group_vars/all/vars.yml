@@ -71,6 +71,7 @@ npm_global_tools:
   - ts-node
   - neovim
 
+
 # External git repos
 external_repos:
   - repo: "https://github.com/HexSleeves/nvim.git"

@@ -67,3 +67,75 @@
   when:
     - ansible_facts["os_family"] != "Darwin"
     - not external_monaspace_dir.stat.exists
+
+- name: Check if Claude Code is installed
+  ansible.builtin.stat:
+    path: "{{ local_bin }}/claude-code"
+  register: external_claude_code
+
+- name: Install Claude Code
+  ansible.builtin.shell:
+    cmd: curl -fsSL https://claude.ai/install.sh | bash
+  args:
+    executable: /bin/bash
+  when: not external_claude_code.stat.exists
+
+- name: Check if Codex CLI is installed
+  ansible.builtin.stat:
+    path: "{{ local_bin }}/codex"
+  register: external_codex
+
+- name: Install Codex CLI
+  ansible.builtin.shell:
+    cmd: curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
+  args:
+    executable: /bin/bash
+  when: not external_codex.stat.exists
+
+- name: Check if OpenCode is installed
+  ansible.builtin.stat:
+    path: "{{ local_bin }}/opencode"
+  register: external_opencode
+
+- name: Install OpenCode
+  ansible.builtin.shell:
+    cmd: curl -fsSL https://opencode.ai/install | bash
+  args:
+    executable: /bin/bash
+  when: not external_opencode.stat.exists
+
+- name: Check if Raycast Beta is installed
+  ansible.builtin.stat:
+    path: "/Applications/Raycast Beta.app"
+  register: external_raycast_beta
+
+- name: Uninstall Raycast v1 if present
+  ansible.builtin.command:
+    cmd: brew uninstall --cask raycast
+  register: external_raycast_remove
+  changed_when: "'Successfully uninstalled' in external_raycast_remove.stderr"
+  failed_when: false
+  when:
+    - ansible_facts['os_family'] == "Darwin"
+    - not external_raycast_beta.stat.exists
+
+- name: Download Raycast Beta DMG
+  ansible.builtin.get_url:
+    url: "{{ raycast_beta_dmg_url }}"
+    dest: /tmp/Raycast_Beta.dmg
+    mode: "0644"
+  when:
+    - ansible_facts['os_family'] == "Darwin"
+    - not external_raycast_beta.stat.exists
+
+- name: Install Raycast Beta
+  ansible.builtin.command:
+    cmd: |
+      hdiutil attach /tmp/Raycast_Beta.dmg -nobrowse -quiet &&
+      cp -R "/Volumes/Raycast Beta/Raycast Beta.app" /Applications/ &&
+      hdiutil detach "/Volumes/Raycast Beta" -quiet
+  args:
+    executable: /bin/bash
+  when:
+    - ansible_facts['os_family'] == "Darwin"
+    - not external_raycast_beta.stat.exists

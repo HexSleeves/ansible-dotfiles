@@ -5,4 +5,4 @@ localhost ansible_connection=local ansible_python_interpreter=/usr/bin/python3
 # Add personal hostnames here
 
 [work]
-# Add work hostnames here
+Adobe-Macbook-Pro.local
