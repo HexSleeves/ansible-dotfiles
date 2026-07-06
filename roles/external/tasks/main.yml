@@ -92,6 +92,18 @@
     executable: /bin/bash
   when: not external_codex.stat.exists
 
+- name: Check if uv is installed
+  ansible.builtin.stat:
+    path: "{{ local_bin }}/uv"
+  register: external_uv
+
+- name: Install uv
+  ansible.builtin.shell:
+    cmd: curl -LsSf https://astral.sh/uv/install.sh | sh
+  args:
+    executable: /bin/bash
+  when: not external_uv.stat.exists
+
 - name: Check if OpenCode is installed
   ansible.builtin.stat:
     path: "{{ local_bin }}/opencode"
