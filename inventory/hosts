@@ -6,3 +6,4 @@ localhost ansible_connection=local ansible_python_interpreter=/usr/bin/python3
 
 [work]
 Adobe-Macbook-Pro.local
+Mac-G7H4C69N4L
