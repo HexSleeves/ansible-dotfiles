@@ -20,6 +20,14 @@
   become: true
   when: not (macos_touchid_sudo | default(true) | bool)
 
+- name: Remove stray TouchID line from /etc/pam.d/sudo
+  ansible.builtin.lineinfile:
+    path: /etc/pam.d/sudo
+    regexp: '^auth\s+sufficient\s+pam_tid\.so'
+    state: absent
+  become: true
+  when: not (macos_touchid_sudo | default(true) | bool)
+
 - name: Configure passwordless sudo
   ansible.builtin.lineinfile:
     path: "/etc/sudoers.d/{{ ansible_facts['env']['USER'] }}-nopasswd"
