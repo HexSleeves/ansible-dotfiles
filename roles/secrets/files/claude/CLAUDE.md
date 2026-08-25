@@ -141,6 +141,15 @@ If a word is optional, delete it.
 If a phrase is optional, delete it.
 If a paragraph is optional, delete it.
 
+## Writing Style
+
+Never use em-dashes. Not in code, docs, commits, or any output.
+Use commas, periods, or parentheses instead.
+
+For any documentation, Slack messages, DMs, or other human-facing
+prose: use the `humanizer` skill before sending or writing.
+Humanize first, send second.
+
 ## Final Rule
 
 Solve first.
