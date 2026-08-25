@@ -1,5 +1,13 @@
 # ansible-dotfiles
 
+> **DEPRECATED (2026-08-25).** This repo is retired. All machine management has
+> moved to [hm-dotfiles](https://github.com/HexSleeves/hm-dotfiles)
+> (Home Manager + nix-darwin + sops-nix), which now covers SSH, GPG, packages,
+> homebrew, dotfiles, and secrets for every host in the old inventory.
+> Do not run `just apply` / `site.yml` against any machine; it would fight
+> home-manager over the same files (`~/.ssh/config`, `~/.claude/*`, and more).
+> Kept as history only.
+
 Cross-platform machine provisioning for macOS and Linux (Debian/Ubuntu, Arch, RHEL/Fedora).
 
 **Architecture:** Ansible owns system-level setup — packages, secrets, SSH/GPG keys, and OS configuration. Dotfiles are delegated to [chezmoi](https://www.chezmoi.io/) via a [separate repo](https://github.com/HexSleeves/dotfiles).
