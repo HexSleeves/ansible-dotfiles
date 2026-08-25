@@ -61,6 +61,45 @@ Host gist.github.com
     User git
     IdentityFile ~/.ssh/id_ed25519
 
+Host github.com-adobe
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_adobe
+
+Host protopack-ghec
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_adobe
+{% if ansible_facts['os_family'] == "Darwin" %}
+    AddKeysToAgent yes
+    UseKeychain yes
+{% endif %}
+    IdentitiesOnly yes
+    StrictHostKeyChecking accept-new
+
+Host artifactory.corp.adobe.com
+    HostName artifactory.corp.adobe.com
+    User jlecoq
+    IdentityFile ~/.ssh/id_artifactory
+    IdentitiesOnly yes
+
+Host forge
+    HostName forge
+    User lecoqjacob
+    IdentityFile ~/.ssh/id_ed25519
+    StrictHostKeyChecking accept-new
+
+Host jacobs-liatrio-macbook-pro
+    HostName 100.127.47.116
+    User lecoqjacob
+    IdentityAgent $SSH_AUTH_SOCK
+    IdentityFile ~/.ssh/id_ed25519
+    StrictHostKeyChecking accept-new
+
+{% if ansible_facts['os_family'] == "Darwin" %}
+Include ~/.ssh/conductor_config
+{% endif %}
+
 Host *.bayer.com *.bayer.cnb
     IdentityFile ~/.ssh/id_bayer
 
